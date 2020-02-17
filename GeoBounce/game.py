@@ -4,6 +4,7 @@ GAME_DIMENSIONS = [800, 600]
 GAME_RESIZABLE = False
 GAME_NAME = "GeoBounce"
 
+
 class Game(object):
     def __init__(self):
         # variables are to be synced with Tk window, DO NOT CHANGE DIRECTLY

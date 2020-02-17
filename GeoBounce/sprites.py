@@ -20,7 +20,10 @@ class Sprite(object):
         self._game._canvas.move(self._tag, *new_position)
 
     def collide(self):
-        return self._game._canvas.find_overlapping(*self._position, *[x + y for x, y in zip(self._position, self._dimensions)])
+        return self._game._canvas.find_overlapping(
+            *self._position,
+            *[x + y for x, y in zip(self._position, self._dimensions)],
+        )
 
 
 class Obstacle(Sprite):
@@ -31,6 +34,7 @@ class Obstacle(Sprite):
 class Item(Sprite):
     def __init__(self, game, position, dimensions, color):
         super().__init__(game, position, dimensions, color)
+
 
 class Player(Sprite):
     def __init__(self, game, position, dimensions, color):
@@ -85,36 +89,3 @@ class Player(Sprite):
         except IndexError:
             self.jumping = False
             self.jump_index = 0
-
-
-# class GeoBox(object):
-#     def __init__(self, game):
-#         self.game = game
-#         self.canvas = game._canvas
-#         self.position = GEOBOX_POSITION
-#         self.tag = None
-#         self.collide = False
-#         self.draw()
-
-#     def draw(self):
-#         self.tag = self.game.create_rectangle(
-#             *self.position,
-#             50,
-#             50,
-#             fill="blue",
-#             outline="blue",
-#         ) # x, y, width, height
-
-#     def move_by(self, new_position):
-#         self.position[0] += new_position[0]
-#         self.position[1] += new_position[1]
-#         self.canvas.move(self.tag, *new_position)
-
-#     def move_to(self, new_position):
-#         self.position[0] = new_position[0]
-#         self.position[1] = new_position[1]
-#         self.canvas.coords(self.tag, *self.position, self.position[0] + 50, self.position[1] + 50)
-
-#     def jump(self):
-#         for item in coords:
-#         self.move_by([0, 1])

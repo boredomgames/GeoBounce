@@ -7,14 +7,14 @@ level1 = [
         "type": "player",
         "position": [390, 580],
         "dimensions": [20, 20],
-        "color": "blue"
+        "color": "blue",
     },
     {
         "type": "obstacle",
         "position": [1000, 580],
         "dimensions": [20, 20],
-        "color": "black"
-    }
+        "color": "black",
+    },
 ]
 
 SPEED = 5
@@ -34,15 +34,36 @@ class Level(object):
     def set_up(self, game):
         for item in self._things:
             if item["type"] == "obstacle":
-                self._drawn.append(Obstacle(game, position=item["position"], dimensions=item["dimensions"], color=item["color"]))
+                self._drawn.append(
+                    Obstacle(
+                        game,
+                        position=item["position"],
+                        dimensions=item["dimensions"],
+                        color=item["color"],
+                    )
+                )
                 self._drawn[-1].draw()
                 self._obstacles.append(self._drawn[-1]._tag)
             elif item["type"] == "item":
-                self._drawn.append(Item(game, position=item["position"], dimensions=item["dimensions"], color=item["color"]))
+                self._drawn.append(
+                    Item(
+                        game,
+                        position=item["position"],
+                        dimensions=item["dimensions"],
+                        color=item["color"],
+                    )
+                )
                 self._drawn[-1].draw()
                 self._items.append(self._drawn[-1]._tag)
             elif item["type"] == "player":
-                self._drawn.append(Player(game, position=item["position"], dimensions=item["dimensions"], color=item["color"]))
+                self._drawn.append(
+                    Player(
+                        game,
+                        position=item["position"],
+                        dimensions=item["dimensions"],
+                        color=item["color"],
+                    )
+                )
                 self._drawn[-1].draw()
                 self._player = self._drawn[-1]
 
