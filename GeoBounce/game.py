@@ -1,35 +1,23 @@
-# code imported from TwoDimensional
-
 from tkinter import Tk, Canvas
 
+GAME_DIMENSIONS = [800, 600]
+GAME_RESIZABLE = False
+GAME_NAME = "GeoBounce"
 
 class Game(object):
-    def __init__(
-        self,
-        name,
-        dimensions=[800, 600],
-        location=[10, 10],
-        resizable=[True, True],
-    ):
+    def __init__(self):
         # variables are to be synced with Tk window, DO NOT CHANGE DIRECTLY
-        self._name = name
-        self._dimensions = dimensions
-        self._location = location
-        self._resizable = resizable
+        self._name = GAME_NAME
+        self._dimensions = GAME_DIMENSIONS
+        self._resizable = GAME_RESIZABLE
 
         # initialize tkinter window
         self._window = Tk()
         # self._window.overrideredirect(True)  # probably not needed
         self._window.withdraw()
         self._window.title(self._name)
-        self._window.geometry(
-            f"""{self._dimensions[0]}x{self._dimensions[1]}{
-            "+" + str(self._location[0])
-            if self._location[0] > 0 else str(self._location[0])}{
-            "+" + str(self._location[1])
-            if self._location[1] > 0 else str(self._location[1])}"""
-        )
-        self._window.resizable(*self._resizable)
+        self._window.geometry(f"{self._dimensions[0]}x{self._dimensions[1]}")
+        self._window.resizable(self._resizable, self._resizable)
 
         # initialize canvas to fill window
         self._canvas = Canvas(self._window, highlightthickness=0)
@@ -97,32 +85,6 @@ class Game(object):
         self.update()
 
     @property
-    def location(self):
-        return self._location
-
-    @location.setter
-    def location(
-        self, value
-    ):  # value is +x from left, -x from right, +y from top, -y from bottom
-        try:
-            # make sure value is an integer
-            self._location = [int(str(value[0])), int(str(value[1]))]
-            # set the window location automatically
-            self._window.geometry(
-                f"""{
-                "+" + str(self._location[0])
-                if self._location[0] > 0 else str(self._location[0])
-                }{
-                "+" + str(self._location[1])
-                if self._location[1] > 0 else str(self._location[1])
-                }"""
-            )
-        except ValueError:
-            raise ValueError("location must be integers") from None
-
-        self.update()
-
-    @property
     def resizable(self):
         return self._resizable
 
@@ -130,9 +92,9 @@ class Game(object):
     def resizable(self, value):
         try:
             # make sure value is a boolean
-            self._resizable = [bool(value[0]), bool(value[1])]
+            self._resizable = bool(value)
             # set the window resizable automatically
-            self._window.resizable(*self._resizable)
+            self._window.resizable(self._resizable, self._resizable)
         except ValueError:
             raise ValueError("resizable must be booleans") from None
 
