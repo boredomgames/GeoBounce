@@ -42,9 +42,9 @@ class Player(Sprite):
         self.jumping = False
         self.jump_index = 0
         self.jump_path = [
-            -15,
-            -14,
-            -13,
+            # -15,
+            # -14,
+            # -13,
             -12,
             -11,
             -10,
@@ -71,9 +71,9 @@ class Player(Sprite):
             10,
             11,
             12,
-            13,
-            14,
-            15,
+            # 13,
+            # 14,
+            # 15,
         ]
 
         self._game.on("<space>")(lambda x: self.jump())

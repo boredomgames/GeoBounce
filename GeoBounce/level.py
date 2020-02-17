@@ -1,5 +1,6 @@
 from .sprites import Obstacle, Item, Player
 from .timer import Timer
+import time
 
 
 level1 = [
@@ -17,7 +18,7 @@ level1 = [
     },
 ]
 
-SPEED = 5
+SPEED = 7
 
 
 class Level(object):
@@ -71,8 +72,7 @@ class Level(object):
         game.play()
 
         while not self._end:
-            if not self._timer.tick(60):
-                continue
+            self._timer.begin()
 
             for item in self._drawn:
                 if item is not self._player:
@@ -83,6 +83,8 @@ class Level(object):
             game.update()
 
             self.check_collide(game)
+
+            self._timer.end(60)
 
     def check_collide(self, game):
         for item in self._player.collide():
