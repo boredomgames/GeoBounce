@@ -1,39 +1,7 @@
 from .sprites import Obstacle, Surface, Player, Reward
 from .timer import Timer
 
-
-level1 = [
-    {
-        "type": "player",
-        "position": [390, 380],
-        "dimensions": [20, 20],
-        "color": "blue",
-    },
-    {
-        "type": "surface",
-        "position": [0, 400],
-        "dimensions": [800, 200],
-        "color": "black",
-    },
-    {
-        "type": "obstacle",
-        "position": [900, 580],
-        "dimensions": [20, 20],
-        "color": "red",
-    },
-    {
-        "type": "surface",
-        "position": [1200, 580],
-        "dimensions": [50, 20],
-        "color": "black",
-    },
-    {
-        "type": "reward",
-        "position": [1220, 560],
-        "dimensions": [10, 10],
-        "color": "yellow",
-    },
-]
+from tkinter import messagebox
 
 SPEED = 10
 GRAVITY = 30
@@ -60,6 +28,7 @@ class Level(object):
         self._player_move = True
         self._player_points = 0
         self._end = False
+        self._testmode = False
         self._timer = Timer()
 
     def initialize(self):
@@ -103,10 +72,16 @@ class Level(object):
 
         self._points_display = self._game._canvas.create_text(720, 20, text=f"Score: {self._player_points}", font="sans-serif")
 
+        def event_close():
+            if messagebox.askokcancel("Quit", "Do you want to quit?"):
+                self._game.terminate()
+
+        self._game._window.protocol("WM_DELETE_WINDOW", event_close)
+
     def run(self):
         self._game.play()
 
-        while not self._end:
+        while not self._end or self._testmode:
             self._timer.begin()
 
             for item in self._sprites["obstacles"]:
@@ -148,9 +123,25 @@ class Level(object):
 
             self._game._canvas.itemconfig(self._points_display, text=f"Score: {self._player_points}", font="sans-serif")
 
+            if len(self._game._canvas.find_all()) == 2:
+                break
+
             self._game.update()
 
             self._timer.end(30)
+
+        while True:
+            if self._end == True:
+                self._game._canvas.create_text(400, 300, text="YOU LOST", font="sans-serif 72")
+            else:
+                self._game._canvas.create_text(400, 300, text="YOU WON!", font="sans-serif 72")
+
+                if self._player_points == 1:
+                    self._game._canvas.create_text(400, 350, text=f"You Earned {self._player_points} Point!", font="sans-serif 24")
+                else:
+                    self._game._canvas.create_text(400, 350, text=f"You Earned {self._player_points} Points!", font="sans-serif 24")
+
+            self._game.update()
 
     def check_collide(self):
         self._player_gravity = True

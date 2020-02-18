@@ -1,10 +1,12 @@
 from .game import Game
-from .level import Level, level1
+from .level import Level
+from .levels import level1
 
 
 def main():
     game = Game()
     level = Level(game, "Level 1", level1)
+    # level._testmode = True  # FOR TESTING ONLY
     level.initialize()
     game.play()
     level.run()
