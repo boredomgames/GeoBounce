@@ -22,7 +22,11 @@ class Sprite(object):
     def teleport(self, new_position):
         self._position[0] = new_position[0]
         self._position[1] = new_position[1]
-        self._game._canvas.coords(self._tag, *self._position, *[x + y for x, y in zip(self._position, self._dimensions)])
+        self._game._canvas.coords(
+            self._tag,
+            *self._position,
+            *[x + y for x, y in zip(self._position, self._dimensions)],
+        )
 
     def collide(self):
         return self._game._canvas.find_overlapping(
@@ -48,6 +52,7 @@ class Reward(Sprite):
     def __init__(self, game, position, dimensions, color):
         super().__init__(game, position, dimensions, color)
 
+
 class Player(Sprite):
     def __init__(self, game, position, dimensions, color):
         super().__init__(game, position, dimensions, color)
@@ -58,12 +63,10 @@ class Player(Sprite):
             -19,
             -15,
             -11,
-            -7,
-            -3,
+            -10,
             -0,
             0,
-            3,
-            7,
+            10,
             11,
             15,
             19,
