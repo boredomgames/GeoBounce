@@ -4,10 +4,10 @@ from .level import Level, level1
 
 def main():
     game = Game()
-    level = Level("Level 1", level1)
-    level.set_up(game)
+    level = Level(game, "Level 1", level1)
+    level.initialize()
     game.play()
-    level.run(game)
+    level.run()
 
 
 if __name__ == "__main__":

@@ -19,11 +19,19 @@ class Sprite(object):
         self._position[1] += new_position[1]
         self._game._canvas.move(self._tag, *new_position)
 
+    def teleport(self, new_position):
+        self._position[0] = new_position[0]
+        self._position[1] = new_position[1]
+        self._game._canvas.coords(self._tag, *self._position, *[x + y for x, y in zip(self._position, self._dimensions)])
+
     def collide(self):
         return self._game._canvas.find_overlapping(
             *self._position,
             *[x + y for x, y in zip(self._position, self._dimensions)],
         )
+
+    def delete(self):
+        self._game._canvas.delete(self._tag)
 
 
 class Obstacle(Sprite):
@@ -31,10 +39,14 @@ class Obstacle(Sprite):
         super().__init__(game, position, dimensions, color)
 
 
-class Item(Sprite):
+class Surface(Sprite):
     def __init__(self, game, position, dimensions, color):
         super().__init__(game, position, dimensions, color)
 
+
+class Reward(Sprite):
+    def __init__(self, game, position, dimensions, color):
+        super().__init__(game, position, dimensions, color)
 
 class Player(Sprite):
     def __init__(self, game, position, dimensions, color):
@@ -42,9 +54,6 @@ class Player(Sprite):
         self.jumping = False
         self.jump_index = 0
         self.jump_path = [
-            # -15,
-            # -14,
-            # -13,
             -12,
             -11,
             -10,
@@ -71,9 +80,6 @@ class Player(Sprite):
             10,
             11,
             12,
-            # 13,
-            # 14,
-            # 15,
         ]
 
         self._game.on("<space>")(lambda x: self.jump())
