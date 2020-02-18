@@ -150,7 +150,7 @@ class Level(object):
 
             self._game.update()
 
-            self._timer.end(60)
+            self._timer.end(30)
 
     def check_collide(self):
         self._player_gravity = True
