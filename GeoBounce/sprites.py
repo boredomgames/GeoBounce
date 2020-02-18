@@ -58,20 +58,7 @@ class Player(Sprite):
         super().__init__(game, position, dimensions, color)
         self.jumping = False
         self.jump_index = 0
-        self.jump_path = [
-            -23,
-            -19,
-            -15,
-            -11,
-            -10,
-            -0,
-            0,
-            10,
-            11,
-            15,
-            19,
-            23,
-        ]
+        self.jump_path = [-23, -19, -15, -11, -10, -0, 0, 10, 11, 15, 19, 23]
 
         self._game.on("<space>")(lambda x: self.jump())
 
