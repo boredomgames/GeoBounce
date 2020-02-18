@@ -1,6 +1,5 @@
 from .sprites import Obstacle, Surface, Player, Reward
 from .timer import Timer
-import time
 
 
 level1 = [
@@ -36,8 +35,8 @@ level1 = [
     },
 ]
 
-SPEED = 5
-GRAVITY = 15
+SPEED = 10
+GRAVITY = 30
 
 
 class Level(object):
