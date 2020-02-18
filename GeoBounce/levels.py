@@ -15,13 +15,13 @@ level1 = [
         "type": "obstacle",
         "position": [600, 380],
         "dimensions": [20, 20],
-        "color": "red"
+        "color": "red",
     },
     {
         "type": "obstacle",
         "position": [780, 380],
         "dimensions": [20, 20],
-        "color": "red"
+        "color": "red",
     },
     {
         "type": "obstacle",
@@ -45,6 +45,90 @@ level1 = [
         "type": "surface",
         "position": [1300, 560],
         "dimensions": [100, 40],
-        "color": "black"
-    }
+        "color": "black",
+    },
+    {
+        "type": "surface",
+        "position": [1400, 540],
+        "dimensions": [100, 60],
+        "color": "black",
+    },
+    {
+        "type": "reward",
+        "position": [1420, 520],
+        "dimensions": [10, 10],
+        "color": "yellow",
+    },
+    {
+        "type": "surface",
+        "position": [1500, 540],
+        "dimensions": [100, 60],
+        "color": "black",
+    },
+    {
+        "type": "surface",
+        "position": [1600, 560],
+        "dimensions": [100, 40],
+        "color": "black",
+    },
+    {
+        "type": "reward",
+        "position": [1620, 540],
+        "dimensions": [10, 10],
+        "color": "yellow",
+    },
+    {
+        "type": "surface",
+        "position": [1700, 580],
+        "dimensions": [100, 20],
+        "color": "black",
+    },
+    {
+        "type": "reward",
+        "position": [1820, 580],
+        "dimensions": [10, 10],
+        "color": "yellow",
+    },
+    {
+        "type": "obstacle",
+        "position": [2000, 580],
+        "dimensions": [20, 20],
+        "color": "red",
+    },
+    {
+        "type": "obstacle",
+        "position": [2150, 580],
+        "dimensions": [20, 20],
+        "color": "red",
+    },
+    {
+        "type": "obstacle",
+        "position": [2300, 595],
+        "dimensions": [20, 20],
+        "color": "red",
+    },
+    {
+        "type": "obstacle",
+        "position": [2450, 580],
+        "dimensions": [20, 20],
+        "color": "red",
+    },
+    {
+        "type": "obstacle",
+        "position": [2600, 580],
+        "dimensions": [20, 20],
+        "color": "red",
+    },
+    {
+        "type": "obstacle",
+        "position": [2750, 550],
+        "dimensions": [20, 20],
+        "color": "red",
+    },
+    {
+        "type": "obstacle",
+        "position": [2900, 580],
+        "dimensions": [20, 20],
+        "color": "red",
+    },
 ]
