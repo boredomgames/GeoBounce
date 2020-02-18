@@ -3,8 +3,14 @@ from .timer import Timer
 
 from tkinter import messagebox
 
-SPEED = 10
-GRAVITY = 30
+
+# low
+# SPEED = 10
+# GRAVITY = 30
+
+# high
+SPEED = 5
+GRAVITY = 15
 
 
 class Level(object):
@@ -167,7 +173,11 @@ class Level(object):
 
             self._game.update()
 
-            self._timer.end(30)
+            # low
+            # self._timer.end(30)
+
+            # high
+            self._timer.end(60)
 
         while True:
             if self._end == True:
