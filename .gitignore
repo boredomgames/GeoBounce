@@ -131,3 +131,8 @@ dmypy.json
 
 # Sublime Text Configuration
 .subl/
+
+# Repl.it bashrc
+.bashrc
+.replit
+nohup.out
