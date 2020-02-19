@@ -35,6 +35,7 @@ class Level(object):
         self._player_points = 0
         self._end = False
         self._testmode = False
+        self._askclose = True
         self._timer = Timer()
 
     def initialize(self):
@@ -93,7 +94,9 @@ class Level(object):
         )
 
         def event_close():
-            if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            if self._askclose and messagebox.askokcancel("Quit", "Do you want to quit?"):
+                self._game.terminate()
+            elif not self._askclose:
                 self._game.terminate()
 
         self._game._window.protocol("WM_DELETE_WINDOW", event_close)
