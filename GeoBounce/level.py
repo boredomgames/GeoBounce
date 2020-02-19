@@ -114,7 +114,6 @@ class Level(object):
                 item.move([-SPEED, 0])
 
             self._sprites["player"].run_jump()
-            self._game.update()
             self.check_collide()
 
             if (
