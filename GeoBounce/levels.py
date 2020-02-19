@@ -62,13 +62,7 @@ level1 = [
     {
         "type": "surface",
         "position": [1500, 540],
-        "dimensions": [100, 60],
-        "color": "black",
-    },
-    {
-        "type": "surface",
-        "position": [1600, 560],
-        "dimensions": [100, 40],
+        "dimensions": [200, 60],
         "color": "black",
     },
     {
