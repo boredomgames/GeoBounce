@@ -5,12 +5,21 @@ from tkinter import messagebox
 
 
 # low
-# SPEED = 10
-# GRAVITY = 30
+#SPEED = 10
+#GRAVITY = 30
 
 # high
-SPEED = 5
-GRAVITY = 15
+#SPEED = 5
+#GRAVITY = 15
+
+TEMPLATE_OBSTACLE_SIZES = {
+    "1x1": [20, 20],
+    "1x2": [20, 40],
+    "2x1": [40, 20],
+    "2x2": [40, 40]
+}
+
+TEMPLATE_OBSTACLE_COLOR = "red"
 
 
 class Level(object):
@@ -47,6 +56,19 @@ class Level(object):
                         position=item["position"],
                         dimensions=item["dimensions"],
                         color=item["color"],
+                    )
+                )
+                self._sprites["obstacles"][-1].draw()
+                self._sprites["obstacles_tags"].append(
+                    self._sprites["obstacles"][-1]._tag
+                )
+            elif item["type"] == "template_obstacle": # New obstacle type with template dimension sizes and colors
+                self._sprites["obstacles"].append(
+                    Obstacle(
+                        self._game,
+                        position=item["position"],
+                        dimensions=TEMPLATE_OBSTACLE_SIZES[item["template"]][:],
+                        color=TEMPLATE_OBSTACLE_COLOR
                     )
                 )
                 self._sprites["obstacles"][-1].draw()
