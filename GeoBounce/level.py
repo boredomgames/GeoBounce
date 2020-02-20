@@ -3,8 +3,14 @@ from .timer import Timer
 
 from tkinter import messagebox
 
-SPEED = 10
-GRAVITY = 30
+
+# low
+# SPEED = 10
+# GRAVITY = 30
+
+# high
+SPEED = 5
+GRAVITY = 15
 
 
 class Level(object):
@@ -29,6 +35,7 @@ class Level(object):
         self._player_points = 0
         self._end = False
         self._testmode = False
+        self._askclose = True
         self._timer = Timer()
 
     def initialize(self):
@@ -87,7 +94,9 @@ class Level(object):
         )
 
         def event_close():
-            if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            if self._askclose and messagebox.askokcancel("Quit", "Do you want to quit?"):
+                self._game.terminate()
+            elif not self._askclose:
                 self._game.terminate()
 
         self._game._window.protocol("WM_DELETE_WINDOW", event_close)
@@ -108,7 +117,6 @@ class Level(object):
                 item.move([-SPEED, 0])
 
             self._sprites["player"].run_jump()
-            self._game.update()
             self.check_collide()
 
             if (
@@ -167,7 +175,11 @@ class Level(object):
 
             self._game.update()
 
-            self._timer.end(30)
+            # low
+            # self._timer.end(30)
+
+            # high
+            self._timer.end(60)
 
         while True:
             if self._end == True:
