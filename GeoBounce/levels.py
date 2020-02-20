@@ -48,6 +48,12 @@ level1 = [
         "color": "black",
     },
     {
+        "type": "reward",
+        "position": [1320, 540],
+        "dimensions": [10, 10],
+        "color": "yellow",
+    },
+    {
         "type": "surface",
         "position": [1400, 540],
         "dimensions": [100, 60],
@@ -61,33 +67,21 @@ level1 = [
     },
     {
         "type": "surface",
-        "position": [1500, 540],
-        "dimensions": [100, 60],
-        "color": "black",
-    },
-    {
-        "type": "surface",
-        "position": [1600, 560],
+        "position": [1500, 560],
         "dimensions": [100, 40],
         "color": "black",
     },
     {
         "type": "reward",
-        "position": [1620, 540],
+        "position": [1520, 540],
         "dimensions": [10, 10],
         "color": "yellow",
     },
     {
         "type": "surface",
-        "position": [1700, 580],
+        "position": [1600, 580],
         "dimensions": [100, 20],
         "color": "black",
-    },
-    {
-        "type": "reward",
-        "position": [1820, 580],
-        "dimensions": [10, 10],
-        "color": "yellow",
     },
     {
         "type": "obstacle",
