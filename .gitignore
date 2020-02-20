@@ -136,3 +136,6 @@ dmypy.json
 .bashrc
 .replit
 nohup.out
+
+# Notes for using Git
+.gitnotes.md
