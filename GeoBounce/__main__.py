@@ -7,6 +7,7 @@ def main():
     game = Game()
     level = Level(game, "Level 1", level1)
     # level._testmode = True  # FOR TESTING ONLY
+    level._askclose = False
     level.initialize()
     game.play()
     level.run()
