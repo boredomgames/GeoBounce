@@ -1,6 +1,14 @@
 from itertools import zip_longest
 from PIL import Image as PILImage, ImageTk as PILImageTk
 
+def rgb(red, green, blue):
+    hex_digits = "0123456789ABCDEF"
+    red1, red2 = divmod(red, 16)
+    green1, green2 = divmod(green, 16)
+    blue1, blue2 = divmod(blue, 16)
+
+    return f'#{"".join(hex_digits[x] for x in (red1, red2, green1, green2, blue1, blue2))}'
+
 # from https://docs.python.org/3/library/itertools.html#recipes
 def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
@@ -22,7 +30,10 @@ class Image(object):
     def tkimage(self):
         return self._tkimage
 
-class SpriteNew(object):
+class RectangleSprite(SpriteNext):
+    def __init__(self, game, coords, dimensions, fill="#000000",)
+
+class SpriteNext(object):
     def __init__(self, game, coords, type_="rectangle", **kwargs):
         self._game = game
         self._type = type_
