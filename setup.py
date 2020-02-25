@@ -9,7 +9,7 @@ config = {
     "url": "https://github.com/boredomgames/GeoBounce",
     "download_url": "https://github.com/boredomgames/GeoBounce",
     "version": "0.1.0",
-    "install_requires": [],
+    "install_requires": ["pillow"],
     "packages": ["GeoBounce"],
     "scripts": [],
     "name": "GeoBounce",
