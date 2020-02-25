@@ -5,8 +5,8 @@ from tkinter import messagebox
 
 
 # low
-#SPEED = 10
-#GRAVITY = 30
+# SPEED = 10
+# GRAVITY = 30
 
 # high
 SPEED = 5
@@ -62,13 +62,23 @@ class Level(object):
                 self._sprites["obstacles_tags"].append(
                     self._sprites["obstacles"][-1]._tag
                 )
+<<<<<<< HEAD
             elif item["type"] == "template_obstacle": # New obstacle type with template dimension sizes and colors
+=======
+            elif (
+                item["type"] == "template_obstacle"
+            ):  # New obstacle type with template dimension sizes and colors
+>>>>>>> 9a40d82203a972f18b8515704df959b997c8361a
                 self._sprites["obstacles"].append(
                     Obstacle(
                         self._game,
                         position=item["position"],
                         dimensions=TEMPLATE_OBSTACLE_SIZES[item["template"]][:],
+<<<<<<< HEAD
                         color=TEMPLATE_OBSTACLE_COLOR
+=======
+                        color=TEMPLATE_OBSTACLE_COLOR,
+>>>>>>> 9a40d82203a972f18b8515704df959b997c8361a
                     )
                 )
                 self._sprites["obstacles"][-1].draw()
@@ -116,7 +126,13 @@ class Level(object):
         )
 
         def event_close():
+<<<<<<< HEAD
             if self._askclose and messagebox.askokcancel("Quit", "Do you want to quit?"):
+=======
+            if self._askclose and messagebox.askokcancel(
+                "Quit", "Do you want to quit?"
+            ):
+>>>>>>> 9a40d82203a972f18b8515704df959b997c8361a
                 self._game.terminate()
             elif not self._askclose:
                 self._game.terminate()
