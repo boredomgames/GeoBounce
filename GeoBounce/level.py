@@ -9,8 +9,8 @@ from tkinter import messagebox
 #GRAVITY = 30
 
 # high
-#SPEED = 5
-#GRAVITY = 15
+SPEED = 5
+GRAVITY = 15
 
 TEMPLATE_OBSTACLE_SIZES = {
     "1x1": [20, 20],
