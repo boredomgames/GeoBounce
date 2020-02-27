@@ -121,7 +121,7 @@ class Level(object):
 
             if (
                 self._player_gravity == True
-                and self._sprites["player"]._position[1]
+                and self._sprites["player"]._coords[1]
                 + self._sprites["player"]._dimensions[1]
                 < 600
                 and self._sprites["player"].jumping == False
@@ -134,34 +134,34 @@ class Level(object):
                 self._sprites["player"].move([-SPEED, 0])
 
             if (
-                self._sprites["player"]._position[0]
+                self._sprites["player"]._coords[0]
                 + self._sprites["player"]._dimensions[0]
                 <= 0
             ):  # end the game when the player exits the screen
                 self._end = True
 
             if (
-                self._sprites["player"]._position[1]
+                self._sprites["player"]._coords[1]
                 + self._sprites["player"]._dimensions[1]
                 >= 600
             ):  # move the player back to the ground if it falls through (due to jumping)
                 self._sprites["player"].teleport(
                     [
-                        self._sprites["player"]._position[0],
+                        self._sprites["player"]._coords[0],
                         600 - self._sprites["player"]._dimensions[1],
                     ]
                 )
 
             for sprite in self._sprites["obstacles"]:
-                if sprite._position[0] + sprite._dimensions[0] <= 0:
+                if sprite._coords[0] + sprite._dimensions[0] <= 0:
                     sprite.delete()
 
             for sprite in self._sprites["surfaces"]:
-                if sprite._position[0] + sprite._dimensions[0] <= 0:
+                if sprite._coords[0] + sprite._dimensions[0] <= 0:
                     sprite.delete()
 
             for sprite in self._sprites["rewards"]:
-                if sprite._position[0] + sprite._dimensions[0] <= 0:
+                if sprite._coords[0] + sprite._dimensions[0] <= 0:
                     sprite.delete()
 
             self._game._canvas.itemconfig(
@@ -223,21 +223,21 @@ class Level(object):
                 ]
 
                 if (
-                    self._sprites["player"]._position[0]
+                    self._sprites["player"]._coords[0]
                     + self._sprites["player"]._dimensions[0]
-                    <= collided_surface._position[0]
+                    <= collided_surface._coords[0]
                 ):  # check if the player is in contact with the left side of the collided surface, if it is, prevent the player from moving
                     self._player_move = False
                 elif (
-                    self._sprites["player"]._position[1]
+                    self._sprites["player"]._coords[1]
                     + self._sprites["player"]._dimensions[1]
-                    >= collided_surface._position[1]
+                    >= collided_surface._coords[1]
                 ):  # check if the player is in contact with the top of the collided surface, if it is, prevent the player from falling
                     self._player_gravity = False
                     self._sprites["player"].teleport(
                         [
-                            self._sprites["player"]._position[0],
-                            collided_surface._position[1]
+                            self._sprites["player"]._coords[0],
+                            collided_surface._coords[1]
                             - self._sprites["player"]._dimensions[1],
                         ]
                     )  # move the player on top of the surface if it falls into it slightly (due to jumping)
