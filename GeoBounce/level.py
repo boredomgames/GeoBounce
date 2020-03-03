@@ -94,7 +94,9 @@ class Level(object):
         )
 
         def event_close():
-            if self._askclose and messagebox.askokcancel("Quit", "Do you want to quit?"):
+            if self._askclose and messagebox.askokcancel(
+                "Quit", "Do you want to quit?"
+            ):
                 self._game.terminate()
             elif not self._askclose:
                 self._game.terminate()
