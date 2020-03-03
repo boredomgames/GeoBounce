@@ -1,6 +1,7 @@
 from itertools import zip_longest
 from PIL import Image as PILImage, ImageTk as PILImageTk
 
+
 def rgb(red, green, blue):
     hex_digits = "0123456789ABCDEF"
     red1, red2 = divmod(red, 16)
@@ -9,8 +10,10 @@ def rgb(red, green, blue):
 
     return f'#{"".join(hex_digits[x] for x in (red1, red2, green1, green2, blue1, blue2))}'
 
-# from https://docs.python.org/3/library/itertools.html#recipes
+
 def grouper(iterable, n, fillvalue=None):
+    "Collect data into fixed-length chunks or blocks"
+    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
 
@@ -30,10 +33,211 @@ class Image(object):
     def tkimage(self):
         return self._tkimage
 
-class RectangleSprite(SpriteNext):
-    def __init__(self, game, coords, dimensions, fill="#000000",)
 
 class SpriteNext(object):
+    def __init__(self, game, coords):
+        self._game = game
+        self._coords = coords
+        self._tag = None
+
+    def call(self, command):  # unsafe?
+        exec(f"self._game._canvas.({self._tag}, {command})")
+
+
+class RectangleSprite(SpriteNext):
+    def __init__(
+        self, game, coords, dimensions, fill="#000000", outline="#000000"
+    ):
+        super().__init__(game, coords)
+
+        self._dimensions = dimensions
+        self._fill = fill
+        self._outline = outline
+
+    def draw(self):
+        self._tag = self._game._canvas.create_rectangle(
+            self._coords,
+            [x[0] + x[1] for x in zip(self._dimensions, self._coords)],
+            fill=self._fill,
+            outline=self._outline,
+        )
+
+    def move(self, coords):
+        self._coords[0] += coords[0]
+        self._coords[1] += coords[1]
+
+        self._game._canvas.move(self._tag, *coords)
+
+    def teleport(self, coords):
+        self._coords[0] = coords[0]
+        self._coords[1] = coords[1]
+
+        self._game._canvas.coords(
+            self._tag,
+            self._coords,
+            [x[0] + x[1] for x in zip(self._dimensions, self._coords)],
+        )
+
+    def collide(self):
+        return self._game._canvas.find_overlapping(
+            self._coords,
+            [x[0] + x[1] for x in zip(self._dimensions, self._coords)],
+        )
+
+    def delete(self):
+        self._game._canvas.delete(self._tag)
+        self._tag = None
+
+
+class ImageSprite(SpriteNext):
+    def __init__(self, game, coords, dimensions, image):
+        super().__init__(game, coords)
+
+        self._dimensions = dimensions
+
+        if isinstance(image, str):
+            self._image = Image(image, dimensions=self._dimensions)
+        else:
+            self._image = image
+
+    def draw(self):
+        self._tag = self._game._canvas.create_image(
+            self._coords,
+            image=self._image.tkimage()
+            if isinstance(self._image, Image)
+            else self._image,
+        )
+
+    def move(self, coords):
+        self._coords[0] += coords[0]
+        self._coords[1] += coords[1]
+
+        self._game._canvas.move(self._tag, *coords)
+
+    def teleport(self, coords):
+        self._coords[0] = coords[0]
+        self._coords[1] = coords[1]
+
+        self._game._canvas.coords(
+            self._tag,
+            self._coords,
+            [x[0] + x[1] for x in zip(self._dimensions, self._coords)],
+        )
+
+    def collide(self):
+        return self._game._canvas.find_overlapping(
+            self._coords,
+            [x[0] + x[1] for x in zip(self._dimensions, self._coords)],
+        )
+
+    def delete(self):
+        self._game._canvas.delete(self._tag)
+        self._tag = None
+
+
+class OvalSprite(SpriteNext):
+    def __init__(
+        self, game, coords, dimensions, fill="#000000", outline="#000000"
+    ):
+        super().__init(game, coords)
+
+        self._dimensions = dimensions
+        self._fill = fill
+        self._outline = outline
+
+    def draw(self):
+        self._tag = self._game._canvas.create_rectangle(
+            self._coords,
+            [x[0] + x[1] for x in zip(self._dimensions, self._coords)],
+            fill=self._fill,
+            outline=self._outline,
+        )
+
+    def move(self, coords):
+        self._coords[0] += coords[0]
+        self._coords[1] += coords[1]
+
+        self._game._canvas.move(self._tag, *coords)
+
+    def teleport(self, coords):
+        self._coords[0] = coords[0]
+        self._coords[1] = coords[1]
+
+        self._game._canvas.coords(
+            self._tag,
+            self._coords,
+            [x[0] + x[1] for x in zip(self._dimensions, self._coords)],
+        )
+
+    def collide(self):
+        return self._game._canvas.find_overlapping(
+            self._coords,
+            [x[0] + x[1] for x in zip(self._dimensions, self._coords)],
+        )
+
+    def delete(self):
+        self._game._canvas.delete(self._tag)
+        self._tag = None
+
+
+class LineSprite(SpriteNext):
+    def __init__(self, game, coords, width=1, fill="#000000"):
+        super().__init__(game, coords)
+
+        self._width = width
+        self._fill = fill
+
+    def draw(self):
+        self._tag = self._game._canvas.create_line(
+            self._coords, fill=self._fill
+        )
+
+    def move(self, coords):
+        self._coords[0] += coords[0]
+        self._coords[1] += coords[1]
+        self._coords[2] += coords[0]
+        self._coords[3] += coords[1]
+
+        self._game._canvas.move(self._tag, *coords)
+
+    def teleport(self, coords):
+        x = min(self._coords[0], self.coords[2])
+        y = min(self._coords[1], self._coords[3])
+
+        self._game._canvas.move(self._tag, coords[0] - x, coords[1] - y)
+
+    def collide(self):
+        return self._game._canvas.find_overlapping(self._coords)
+
+    def delete(self):
+        self._game._canvas.delete(self._tag)
+        self._tag = None
+
+
+class PolygonSprite(object):
+    def __init__(self, game, coords, fill="#000000", outline="#000000"):
+        super().__init__(game, coords)
+
+        self._fill = fill
+        self._outline = outline
+
+    def draw(self):
+        self._tag = self._game._canvas.create_polygon(
+            self._coords,
+            fill=self._fill,
+            outline=self.outline,
+        )
+
+    def move(self, coords):
+        self._coords = [x + coords[0], y + coords[1] for x, y in grouper(self._coords, 2)]
+
+        self._game._canvas.move(self._tag, *coords)
+
+    def teleport(self, coords):
+
+
+
+class SpriteUniversal(object):
     def __init__(self, game, coords, type_="rectangle", **kwargs):
         self._game = game
         self._type = type_
@@ -49,7 +253,9 @@ class SpriteNext(object):
 
         if self._type == "image":
             if isinstance(kwargs["image"], str):
-                self._image = Image(kwargs["image"], dimensions=kwargs["dimensions"])
+                self._image = Image(
+                    kwargs["image"], dimensions=kwargs["dimensions"]
+                )
             else:
                 self._image = kwargs["image"]
         else:
@@ -71,12 +277,13 @@ class SpriteNext(object):
         if self._type == "image":
             self._tag = self._game._canvas.create_image(
                 self._coords,
-                image=self._image.tkimage() if isinstance(self._image, Image) else self._image,
+                image=self._image.tkimage()
+                if isinstance(self._image, Image)
+                else self._image,
             )
         elif self._type == "line":
             self._tag = self._game._canvas.create_line(
-                self._coords,
-                fill=self._fill,
+                self._coords, fill=self._fill
             )
         elif self._type == "oval":
             self._tag = self._game._canvas.create_oval(
@@ -87,9 +294,7 @@ class SpriteNext(object):
             )
         elif self._type == "polygon":
             self._tag = self._game._canvas.create_polygon(
-                self._coords,
-                fill=self._fill,
-                outline=self._outline,
+                self._coords, fill=self._fill, outline=self._outline
             )
         elif self._type == "rectangle":
             self._tag = self._game._canvas.create_rectangle(
@@ -100,7 +305,9 @@ class SpriteNext(object):
             )
 
     def teleport(self, coords):
-        self._game._canvas.move(self._tag, *[x[1] - x[0] for x in zip(self.position(), coords)])
+        self._game._canvas.move(
+            self._tag, *[x[1] - x[0] for x in zip(self.position(), coords)]
+        )
 
     def move(self, coords):
         self._game._canvas.move(self._tag, *coords)
@@ -117,8 +324,11 @@ class SpriteNext(object):
     def collide(self):
         return self._game._canvas.find_overlapping(*self.bbox())
 
+
 class Sprite(object):
-    def __init__(self, game, coords, dimensions, type_="rectangle", color="black"):
+    def __init__(
+        self, game, coords, dimensions, type_="rectangle", color="black"
+    ):
         self._game = game
         self._coords = coords
         self._dimensions = dimensions
@@ -181,7 +391,30 @@ class Player(Sprite):
         # low
         # self.jump_path = [-23, -19, -15, -11, -10, -0, 0, 10, 11, 15, 19, 23]
         # high
-        self.jump_path = [-12, -11, -10, -9, -8, -7, -6, -5, -5, -5, -0, 0, 5, 5, 5, 6, 7, 8, 9, 10, 11, 12]
+        self.jump_path = [
+            -12,
+            -11,
+            -10,
+            -9,
+            -8,
+            -7,
+            -6,
+            -5,
+            -5,
+            -5,
+            -0,
+            0,
+            5,
+            5,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+        ]
 
         self._game.on("<space>")(lambda x: self.jump())
 
