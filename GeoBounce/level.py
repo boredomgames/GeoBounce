@@ -1,4 +1,11 @@
-from .sprites import Obstacle, Surface, Player, Reward
+from .sprites import (
+    RectangleSprite,
+    ImageSprite,
+    OvalSprite,
+    LineSprite,
+    PolygonSprite,
+)  # new
+from .sprites import Obstacle, Surface, Reward, Player  # old
 from .timer import Timer
 
 from tkinter import messagebox
@@ -12,8 +19,278 @@ from tkinter import messagebox
 SPEED = 5
 GRAVITY = 15
 
+SPRITE_TYPES = {
+    "rectangle": RectangleSprite,
+    "image": ImageSprite,
+    "oval": OvalSprite,
+    "line": LineSprite,
+    "polygon": PolygonSprite,
+}
+
+JUMP_PATH = (12, 11, 10, 9, 8, 7, 6, 5, 5, 5, 0)
+
+JUMP_FRAMES = len(JUMP_PATH) * 2
+FPS = 100
+
 
 class Level(object):
+    def __init__(
+        self,
+        game,
+        name,
+        items,
+        legacy=False,
+        config={"dimensions": [800, 600], "resizable": False},
+    ):
+        self._game = game
+        self._name = name
+        self._config = config
+        self._items = items
+
+        self._obstacles = []
+        self._obstacles_tags = []
+        self._surfaces = []
+        self._surfaces_tags = []
+        self._rewards = []
+        self._rewards_tags = []
+        self._player = []
+        self._player_tag = []
+
+        self._player_jumping = False
+        self._player_stuck = False
+        self._player_gravity = True
+        self._player_points = 0
+        self._player_jump_frames = 0
+
+        self._legacy = legacy
+        self._end = False
+        self._timer = Timer()
+
+    def generate(self):
+        if self._legacy:
+            for item in self._items:
+                self.generate_legacy_sprite(item)
+        else:
+            for item in self._items:
+                self.generate_sprite(item)
+
+    def generate_legacy_sprite(self, item):
+        if item["type"] == "obstacle":
+            self._obstacles.append(
+                RectangleSprite(
+                    self._game,
+                    coords=item["position"],
+                    dimensions=item["dimensions"],
+                    fill=item["color"],
+                    outline=item["color"],
+                )
+            )
+        elif item["type"] == "surface":
+            self._surfaces.append(
+                RectangleSprite(
+                    self._game,
+                    coords=item["position"],
+                    dimensions=item["dimensions"],
+                    fill=item["color"],
+                    outline=item["color"],
+                )
+            )
+        elif item["type"] == "reward":
+            self._rewards.append(
+                RectangleSprite(
+                    self._game,
+                    coords=item["position"],
+                    dimensions=item["dimensions"],
+                    fill=item["color"],
+                    outline=item["color"],
+                )
+            )
+        elif item["type"] == "player":
+            self._player.append(
+                RectangleSprite(
+                    self._game,
+                    coords=item["position"],
+                    dimensions=item["dimensions"],
+                    fill=item["color"],
+                    outline=item["color"],
+                )
+            )
+
+    def generate_sprite(self, item):
+        types = {
+            "obstacle": self._obstacles,
+            "surface": self._surfaces,
+            "reward": self._rewards,
+            "player": self._player,
+        }
+
+        if item["sprite_type"] in ("rectangle", "oval"):
+            types[item["type"]].append(
+                SPRITE_TYPES[item["sprite_type"]](
+                    self._game,
+                    coords=item["coords"],
+                    dimensions=item["dimensions"],
+                    fill=item["fill"],
+                    outline=item["outline"],
+                )
+            )
+        elif item["sprite_type"] == "image":
+            types[item["type"]].append(
+                SPRITE_TYPES[item["sprite_type"]](
+                    self._game,
+                    coords=item["coords"],
+                    dimensions=item["dimensions"],
+                    image=item["image"],
+                )
+            )
+        elif item["sprite_type"] == "line":
+            types[item["type"]].append(
+                SPRITE_TYPES[item["sprite_type"]](
+                    self._game,
+                    coords=item["coords"],
+                    width=item["width"],
+                    fill=item["fill"],
+                )
+            )
+        elif item["sprite_type"] == "polygon":
+            types[item["type"]].append(
+                SPRITE_TYPES[item["sprite_type"]](
+                    self._game,
+                    coords=item["coords"],
+                    fill=item["fill"],
+                    outline=item["outline"],
+                )
+            )
+        else:
+            raise ValueError(f'{item["sprite_type"]} is not a sprite type')
+
+    def draw(self):
+        for obstacle in self._obstacles:
+            obstacle.draw()
+            self._obstacles_tags.append(obstacle._tag)
+
+        for surface in self._surfaces:
+            surface.draw()
+            self._surfaces_tags.append(surface._tag)
+
+        for reward in self._rewards:
+            reward.draw()
+            self._rewards_tags.append(reward._tag)
+
+        for player in self._player:
+            player.draw()
+            self._player_tag.append(player._tag)
+
+    def run(self):
+        self._game.name = self._name
+        self._game.dimensions = self._config["dimensions"]
+        self._game.resizable = self._config["resizable"]
+
+        @self._game.on("<space>")
+        def event_space(event):
+            self._player_jumping = True
+
+        while not self._end:
+            self._timer.begin()
+            self.move()
+            self.player_jump()
+            self.collide()
+            self.player_move()
+            self._game.update()
+            self._timer.end(FPS)
+
+        while True:
+            pass
+
+    def move(self):
+        for obstacle in self._obstacles:
+            obstacle.move((-SPEED, 0))
+
+        for surface in self._surfaces:
+            surface.move((-SPEED, 0))
+
+        for reward in self._rewards:
+            reward.move((-SPEED, 0))
+
+    def player_jump(self):
+        if (
+            self._player_jumping == True
+            and self._player_jump_frames < JUMP_FRAMES
+        ):
+            self._player_gravity = False
+
+            if self._player_jump_frames < JUMP_FRAMES / 2:
+                self._player[0].move((0, -JUMP_PATH[self._player_jump_frames]))
+            else:
+                self._player[0].move(
+                    (
+                        0,
+                        JUMP_PATH[
+                            (JUMP_FRAMES // 2) - self._player_jump_frames
+                        ],
+                    )
+                )
+
+            self._player_jump_frames += 1
+        else:
+            self._player_jump_frames = 0
+            self._player_jumping = False
+
+    def player_move(self):
+        player = self._player[0]
+        player_bbox = player.bbox()
+        window_width, window_height = self._game.dimensions
+
+        if (
+            self._player_gravity
+            and player_bbox[3] < window_height
+            and not self._player_jumping
+        ):
+            player.move([0, GRAVITY])
+
+        if self._player_stuck:
+            player.move([-SPEED, 0])
+
+        if player_bbox[3] <= 0:
+            self._end = True
+
+        if player_bbox[3] > window_height:
+            player.teleport(
+                (
+                    player_bbox[0],
+                    window_height - (player_bbox[3] - player_bbox[1]),
+                )
+            )
+
+    def collide(self):
+        self._player_stuck = False
+        self._player_gravity = True
+
+        for item in self._player[0].collide():
+            if item in self._obstacles_tags:
+                self._end = True
+
+            if item in self._surfaces_tags:
+                surface = self._surfaces[self._surfaces_tags.index(item)].bbox()
+                player = self._player[0].bbox()
+
+                if player[2] <= surface[0]:
+                    self._player_stuck = True
+                elif player[3] >= surface[1]:
+                    self._player_gravity = False
+                    self._player[0].teleport(
+                        (player[0], surface[1] - (player[3] - player[1]))
+                    )
+
+            if item in self._rewards_tags:
+                reward = self._rewards[self._rewards_tags.index(item)]
+                reward.delete()
+                self._player_points += 1
+                del self._rewards[self._rewards_tags.index(item)]
+                del self._rewards_tags[self._rewards_tags.index(item)]
+
+
+class LevelOld(object):
     def __init__(self, game, name, items):
         self._name = name
         self._items = items
