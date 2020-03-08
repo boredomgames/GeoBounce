@@ -12,8 +12,6 @@ def rgb(red, green, blue):
 
 
 def grouper(iterable, n, fillvalue=None):
-    "Collect data into fixed-length chunks or blocks"
-    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
 
@@ -38,7 +36,7 @@ class Image(object):
 class SpriteNext(object):
     def __init__(self, game, coords):
         self._game = game
-        self._coords = coords
+        self._coords = list(coords)
         self._tag = None
 
     def call(self, command):  # unsafe?
@@ -51,14 +49,16 @@ class RectangleSprite(SpriteNext):
     ):
         super().__init__(game, coords)
 
-        self._dimensions = dimensions
+        self._dimensions = list(dimensions)
         self._fill = fill
         self._outline = outline
 
     def draw(self):
         self._tag = self._game._canvas.create_rectangle(
-            self._coords,
-            [x[0] + x[1] for x in zip(self._dimensions, self._coords)],
+            self._coords[0],
+            self._coords[1],
+            self._dimensions[0] + self._coords[0],
+            self._dimensions[1] + self._coords[1],
             fill=self._fill,
             outline=self._outline,
         )
@@ -75,12 +75,14 @@ class RectangleSprite(SpriteNext):
 
         self._game._canvas.coords(
             self._tag,
-            self._coords,
-            [x[0] + x[1] for x in zip(self._dimensions, self._coords)],
+            self._coords[0],
+            self._coords[1],
+            self._dimensions[0] + self._coords[0],
+            self._dimensions[1] + self._coords[1],
         )
 
     def collide(self):
-        return self._game._canvas.find_overlapping(self._coords, self.bbox())
+        return self._game._canvas.find_overlapping(*self.bbox())
 
     def delete(self):
         self._game._canvas.delete(self._tag)
@@ -90,7 +92,12 @@ class RectangleSprite(SpriteNext):
         return self._coords
 
     def bbox(self):
-        return tuple(x[0] + x[1] for x in zip(self._dimensions, self._coords))
+        return (
+            self._coords[0],
+            self._coords[1],
+            self._dimensions[0] + self._coords[0],
+            self._dimensions[1] + self._coords[1],
+        )
 
 
 class ImageSprite(SpriteNext):
@@ -124,12 +131,14 @@ class ImageSprite(SpriteNext):
 
         self._game._canvas.coords(
             self._tag,
-            self._coords,
-            [x[0] + x[1] for x in zip(self._dimensions, self._coords)],
+            self._coords[0],
+            self._coords[1],
+            self._dimensions[0] + self._coords[0],
+            self._dimensions[1] + self._coords[1],
         )
 
     def collide(self):
-        return self._game._canvas.find_overlapping(self._coords, self.bbox())
+        return self._game._canvas.find_overlapping(*self.bbox())
 
     def delete(self):
         self._game._canvas.delete(self._tag)
@@ -139,7 +148,12 @@ class ImageSprite(SpriteNext):
         return self._coords
 
     def bbox(self):
-        return tuple(x[0] + x[1] for x in zip(self._dimensions, self._coords))
+        return (
+            self._dimensions[0],
+            self._dimensions[1],
+            self._dimensions[0] + self._coords[0],
+            self._dimensions[1] + self._coords[1],
+        )
 
 
 class OvalSprite(SpriteNext):
@@ -172,12 +186,14 @@ class OvalSprite(SpriteNext):
 
         self._game._canvas.coords(
             self._tag,
-            self._coords,
-            [x[0] + x[1] for x in zip(self._dimensions, self._coords)],
+            self._coords[0],
+            self._coords[1],
+            self._dimensions[0] + self._coords[0],
+            self._dimensions[1] + self._coords[1],
         )
 
     def collide(self):
-        return self._game._canvas.find_overlapping(self._coords, self.bbox())
+        return self._game._canvas.find_overlapping(*self.bbox())
 
     def delete(self):
         self._game._canvas.delete(self._tag)
@@ -187,7 +203,12 @@ class OvalSprite(SpriteNext):
         return self._coords
 
     def bbox(self):
-        return tuple(x[0] + x[1] for x in zip(self._dimensions, self._coords))
+        return (
+            self._dimensions[0],
+            self._dimensions[1],
+            self._dimensions[0] + self._coords[0],
+            self._dimensions[1] + self._coords[1],
+        )
 
 
 class LineSprite(SpriteNext):
@@ -222,7 +243,7 @@ class LineSprite(SpriteNext):
         self._game._canvas.move(self._tag, coords[0] - x, coords[1] - y)
 
     def collide(self):
-        return self._game._canvas.find_overlapping(self.bbox())
+        return self._game._canvas.find_overlapping(*self.bbox())
 
     def delete(self):
         self._game._canvas.delete(self._tag)
@@ -281,7 +302,7 @@ class PolygonSprite(SpriteNext):
         self._game._canvas.coords(self._tag, *coords_new)
 
     def collide(self):
-        return self._game._canvas.find_overlapping(self.bbox())
+        return self._game._canvas.find_overlapping(*self.bbox())
 
     def position(self):
         x = min(item[0] for item in grouper(self._coords, 2))
