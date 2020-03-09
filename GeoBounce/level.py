@@ -27,10 +27,10 @@ SPRITE_TYPES = {
     "polygon": PolygonSprite,
 }
 
-JUMP_PATH = (12, 11, 10, 9, 8, 7, 6, 5, 5, 5, 0)
+JUMP_PATH = (12, 11, 10, 9, 8, 7, 6, 5, 0, 0, 0)
 
 JUMP_FRAMES = len(JUMP_PATH) * 2
-FPS = 100
+FPS = 60
 
 
 class Level(object):
@@ -61,6 +61,7 @@ class Level(object):
         self._player_gravity = True
         self._player_points = 0
         self._player_jump_frames = 0
+        self._testmode = False
 
         self._legacy = legacy
         self._end = False
@@ -197,9 +198,14 @@ class Level(object):
             self.collide()
             self.player_move()
             self._game.update()
+
+            if self._testmode:
+                self._end = False
+
             self._timer.end(FPS)
 
         while True:
+            self._game.update()
             pass
 
     def move(self):
@@ -226,7 +232,7 @@ class Level(object):
                     (
                         0,
                         JUMP_PATH[
-                            (JUMP_FRAMES // 2) - self._player_jump_frames
+                            int(JUMP_FRAMES / 2) - self._player_jump_frames
                         ],
                     )
                 )
@@ -254,7 +260,7 @@ class Level(object):
         if player_bbox[3] <= 0:
             self._end = True
 
-        if player_bbox[3] > window_height:
+        if player_bbox[3] >= window_height:
             player.teleport(
                 (
                     player_bbox[0],
@@ -278,9 +284,14 @@ class Level(object):
                     self._player_stuck = True
                 elif player[3] >= surface[1]:
                     self._player_gravity = False
-                    self._player[0].teleport(
-                        (player[0], surface[1] - (player[3] - player[1]))
-                    )
+
+                    if not player[3] > surface[3]:
+                        self._player[0].teleport(
+                            (player[0], surface[1] - (player[3] - player[1]))
+                        )
+                    else:
+                        self._player_jumping = False
+                        self._player_gravity = True
 
             if item in self._rewards_tags:
                 reward = self._rewards[self._rewards_tags.index(item)]
