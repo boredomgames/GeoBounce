@@ -112,11 +112,14 @@ class ImageSprite(SpriteNext):
             self._image = image
 
     def draw(self):
+        # DO NOT EDIT: Hack required to compensate for image alignment bug
         self._tag = self._game._canvas.create_image(
-            self._coords,
+            self._coords[0],
+            self._coords[1],
             image=self._image.tkimage()
             if isinstance(self._image, Image)
             else self._image,
+            anchor="nw",
         )
 
     def move(self, coords):
@@ -133,8 +136,6 @@ class ImageSprite(SpriteNext):
             self._tag,
             self._coords[0],
             self._coords[1],
-            self._dimensions[0] + self._coords[0],
-            self._dimensions[1] + self._coords[1],
         )
 
     def collide(self):
@@ -149,8 +150,8 @@ class ImageSprite(SpriteNext):
 
     def bbox(self):
         return (
-            self._dimensions[0],
-            self._dimensions[1],
+            self._coords[0],
+            self._coords[1],
             self._dimensions[0] + self._coords[0],
             self._dimensions[1] + self._coords[1],
         )
