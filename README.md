@@ -1,3 +1,1 @@
-# GeoBounce
-
-Work in progress...
+# THIS BRANCH IS ABANDONED!!! USE THE MASTER BRANCH!!!
