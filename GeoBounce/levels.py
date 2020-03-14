@@ -174,10 +174,10 @@ level1 = [
     {
         "type": "goal",
         "sprite_type": "rectangle",
-        "coords": [3100, 550],
-        "dimensions": [100, 20],
-        "fill": "green",
-        "outline": "green",
+        "coords": [3100, 0],
+        "dimensions": [800, 600],
+        "fill": "white",
+        "outline": "white",
     },
 ]
 
@@ -240,9 +240,9 @@ level2 = [
     {
         "type": "goal",
         "sprite_type": "rectangle",
-        "coords": [2000, 540],
-        "dimensions": [100, 20],
-        "fill": "green",
-        "outline": "green",
+        "coords": [2000, 0],
+        "dimensions": [800, 600],
+        "fill": "white",
+        "outline": "white",
     },
 ]
