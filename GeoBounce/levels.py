@@ -1,7 +1,9 @@
 from os import path
 
+
 def image_path(image):
     return f"{path.dirname(__file__)}/images/{image}"
+
 
 level1 = [
     {
