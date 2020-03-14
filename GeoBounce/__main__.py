@@ -1,48 +1,56 @@
-from .game import Game
+from .game import Game, GAME_NAME
 from .level import Level
 from .levels import level1, level2
 from .gui import GUI, Button, Label
 
 import sys
 
-GUI_DRAWN = False
-GAME_RUNNING = False
 
-def level_runner(gui, game, name, level):
-    global GAME_RUNNING, GUI_DRAWN
-    gui.delete()
-    GUI_DRAWN = False
+class GeoBounce(object):
+    def __init__(self):
+        self._game = Game()
+        self._gui = GUI(
+            self._game,
+            coords=(200, 10),
+            dimensions=(400, 590),
+            widgets=[
+                [Label("GeoBounce", style={"font_size": 100})],
+                [
+                    Button(
+                        "Level 1",
+                        command=lambda e: self.run_level("Level 1", level1),
+                    ),
+                    Button(
+                        "Level 2",
+                        command=lambda e: self.run_level("Level 2", level2),
+                    ),
+                ],
+                [
+                    Label(
+                        "Please come back later for more levels...",
+                        style={"font_size": 20},
+                    )
+                ],
+            ],
+        )
 
-    level = Level(game, name, level)
-    level.generate()
-    level.draw()
-    level.run()
-    level.delete()
+    def run(self):
+        self._gui.draw()
+        self._game.play(loop=True)
 
-    GAME_RUNNING = False
+    def run_level(self, name, level):
+        self._gui.delete()
 
-def main():
-    global GUI_DRAWN
+        level = Level(self._game, name, level)
+        level.generate()
+        level.draw()
+        level.run()
+        level.delete()
 
-    game = Game()
-    game.play()
-    gui = GUI(game, (200, 10), (400, 590), widgets=[
-        [
-            Label("GeoBounce", style={"font_size": 100})
-        ],
-        [
-            Button("Level 1", command=lambda e: level_runner(gui, game, "Level 1", level1)),
-            Button("Level 2", command=lambda e: level_runner(gui, game, "Level 2", level2)),
-        ]
-    ])
+        self._gui.draw()
+        self._game.name = GAME_NAME
 
-    while True:
-        if not GAME_RUNNING:
-            game.update()
-
-            if not GUI_DRAWN:
-                GUI_DRAWN = True
-                gui.draw()
 
 if __name__ == "__main__":
-    main()
+    game = GeoBounce()
+    game.run()
