@@ -1,5 +1,7 @@
 from itertools import zip_longest
-from PIL import Image as PILImage, ImageTk as PILImageTk
+
+from PIL import Image as PILImage
+from PIL import ImageTk as PILImageTk
 
 
 def rgb(red, green, blue):

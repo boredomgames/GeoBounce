@@ -1,4 +1,4 @@
-from tkinter import Tk, Canvas
+from tkinter import Canvas, Tk
 
 GAME_DIMENSIONS = [800, 600]
 GAME_RESIZABLE = False

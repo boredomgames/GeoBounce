@@ -1,12 +1,11 @@
 from .sprites import (
-    RectangleSprite,
     ImageSprite,
-    OvalSprite,
     LineSprite,
+    OvalSprite,
     PolygonSprite,
+    RectangleSprite,
 )
 from .timer import Timer
-
 
 SPEED = 5
 GRAVITY = 15

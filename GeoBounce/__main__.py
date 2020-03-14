@@ -1,9 +1,9 @@
-from .game import Game, GAME_NAME
+import sys
+
+from .game import GAME_NAME, Game
+from .gui import GUI, Button, Label
 from .level import Level
 from .levels import level1, level2
-from .gui import GUI, Button, Label
-
-import sys
 
 
 class GeoBounce(object):
