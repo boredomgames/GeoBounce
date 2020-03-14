@@ -1,7 +1,8 @@
 from .game import Game
-from .level import LevelOld, Level
+from .level import Level
 from .levels import level1, level2
 from .gui import GUI, Button, Label
+
 import sys
 
 GUI_DRAWN = False
@@ -16,7 +17,7 @@ def level_runner(gui, game, name, level):
     level.generate()
     level.draw()
     level.run()
-    level.cleanup()
+    level.delete()
 
     GAME_RUNNING = False
 
