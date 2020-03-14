@@ -33,7 +33,7 @@ class Image(object):
         return self._tkimage
 
 
-class SpriteNext(object):
+class Sprite(object):
     def __init__(self, game, coords):
         self._game = game
         self._coords = list(coords)
@@ -43,7 +43,7 @@ class SpriteNext(object):
         exec(f"self._game._canvas.({self._tag}, {command})")
 
 
-class RectangleSprite(SpriteNext):
+class RectangleSprite(Sprite):
     def __init__(
         self, game, coords, dimensions, fill="#000000", outline="#000000"
     ):
@@ -100,7 +100,7 @@ class RectangleSprite(SpriteNext):
         )
 
 
-class ImageSprite(SpriteNext):
+class ImageSprite(Sprite):
     def __init__(self, game, coords, dimensions, image):
         super().__init__(game, coords)
 
@@ -157,7 +157,7 @@ class ImageSprite(SpriteNext):
         )
 
 
-class OvalSprite(SpriteNext):
+class OvalSprite(Sprite):
     def __init__(
         self, game, coords, dimensions, fill="#000000", outline="#000000"
     ):
@@ -212,7 +212,7 @@ class OvalSprite(SpriteNext):
         )
 
 
-class LineSprite(SpriteNext):
+class LineSprite(Sprite):
     def __init__(self, game, coords, width=1, fill="#000000"):
         super().__init__(game, coords)
 
@@ -265,7 +265,7 @@ class LineSprite(SpriteNext):
         return (x_min, y_min, x_max, y_max)
 
 
-class PolygonSprite(SpriteNext):
+class PolygonSprite(Sprite):
     def __init__(self, game, coords, fill="#000000", outline="#000000"):
         super().__init__(game, coords)
 
@@ -318,109 +318,3 @@ class PolygonSprite(SpriteNext):
         y_max = max(item[0] for item in grouper(self._coords, 2))
 
         return (x_min, y_min, x_max, y_max)
-
-
-class Sprite(object):
-    def __init__(
-        self, game, coords, dimensions, type_="rectangle", color="black"
-    ):
-        self._game = game
-        self._coords = coords
-        self._dimensions = dimensions
-        self._type = type
-        self._color = color
-        self._tag = None
-
-    def draw(self):
-        self._tag = self._game._canvas.create_rectangle(
-            *self._coords,
-            *[x + y for x, y in zip(self._coords, self._dimensions)],
-            fill=self._color,
-            outline=self._color,
-        )
-
-    def move(self, new_position):
-        self._coords[0] += new_position[0]
-        self._coords[1] += new_position[1]
-        self._game._canvas.move(self._tag, *new_position)
-
-    def teleport(self, new_position):
-        self._coords[0] = new_position[0]
-        self._coords[1] = new_position[1]
-        self._game._canvas.coords(
-            self._tag,
-            *self._coords,
-            *[x + y for x, y in zip(self._coords, self._dimensions)],
-        )
-
-    def collide(self):
-        return self._game._canvas.find_overlapping(
-            *self._coords,
-            *[x + y for x, y in zip(self._coords, self._dimensions)],
-        )
-
-    def delete(self):
-        self._game._canvas.delete(self._tag)
-
-
-class Obstacle(Sprite):
-    def __init__(self, game, position, dimensions, color):
-        super().__init__(game, position, dimensions=dimensions, color=color)
-
-
-class Surface(Sprite):
-    def __init__(self, game, position, dimensions, color):
-        super().__init__(game, position, dimensions=dimensions, color=color)
-
-
-class Reward(Sprite):
-    def __init__(self, game, position, dimensions, color):
-        super().__init__(game, position, dimensions=dimensions, color=color)
-
-
-class Player(Sprite):
-    def __init__(self, game, position, dimensions, color):
-        super().__init__(game, position, dimensions=dimensions, color=color)
-        self.jumping = False
-        self.jump_index = 0
-        # low
-        # self.jump_path = [-23, -19, -15, -11, -10, -0, 0, 10, 11, 15, 19, 23]
-        # high
-        self.jump_path = [
-            -12,
-            -11,
-            -10,
-            -9,
-            -8,
-            -7,
-            -6,
-            -5,
-            -5,
-            -5,
-            -0,
-            0,
-            5,
-            5,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-        ]
-
-        self._game.on("<space>")(lambda x: self.jump())
-
-    def jump(self):
-        self.jumping = True
-
-    def run_jump(self):
-        try:
-            if self.jumping:
-                self.move([0, self.jump_path[self.jump_index]])
-                self.jump_index += 1
-        except IndexError:
-            self.jumping = False
-            self.jump_index = 0
