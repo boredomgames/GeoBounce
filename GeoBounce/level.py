@@ -55,6 +55,8 @@ class Level(object):
         self._rewards_tags = []
         self._player = []
         self._player_tag = []
+        self._goal = []
+        self._goal_tag = []
 
         self._player_jumping = False
         self._player_stuck = False
@@ -123,6 +125,7 @@ class Level(object):
             "surface": self._surfaces,
             "reward": self._rewards,
             "player": self._player,
+            "goal": self._goal,
         }
 
         if item["sprite_type"] in ("rectangle", "oval"):
@@ -182,6 +185,10 @@ class Level(object):
             player.draw()
             self._player_tag.append(player._tag)
 
+        for goal in self._goal:
+            goal.draw()
+            self._goal_tag.append(goal._tag)
+
     def run(self):
         self._game.name = self._name
         self._game.dimensions = self._config["dimensions"]
@@ -204,9 +211,20 @@ class Level(object):
 
             self._timer.end(FPS)
 
-        while True:
-            self._game.update()
-            pass
+    def cleanup(self):
+        for obstacle in self._obstacles:
+            obstacle.delete()
+
+        for surface in self._surfaces:
+            surface.delete()
+
+        for reward in self._rewards:
+            reward.delete()
+
+        for goal in self._goal:
+            goal.delete()
+
+        self._player[0].delete()
 
     def move(self):
         for obstacle in self._obstacles:
@@ -217,6 +235,9 @@ class Level(object):
 
         for reward in self._rewards:
             reward.move((-SPEED, 0))
+
+        for goal in self._goal:
+            goal.move((-SPEED, 0))
 
     def player_jump(self):
         if (
@@ -299,6 +320,9 @@ class Level(object):
                 self._player_points += 1
                 del self._rewards[self._rewards_tags.index(item)]
                 del self._rewards_tags[self._rewards_tags.index(item)]
+
+            if item in self._goal_tag:
+                self._end = True
 
 
 class LevelOld(object):
