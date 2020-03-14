@@ -211,7 +211,7 @@ class Level(object):
 
             self._timer.end(FPS)
 
-    def cleanup(self):
+    def delete(self):
         for obstacle in self._obstacles:
             obstacle.delete()
 
@@ -240,15 +240,19 @@ class Level(object):
             goal.move((-SPEED, 0))
 
     def player_jump(self):
+        # when player is jumping and is not finished
         if (
-            self._player_jumping == True
+            self._player_jumping
             and self._player_jump_frames < JUMP_FRAMES
         ):
+            # turn off gravity
             self._player_gravity = False
 
             if self._player_jump_frames < JUMP_FRAMES / 2:
+                # move player up if it is less than halfway through
                 self._player[0].move((0, -JUMP_PATH[self._player_jump_frames]))
             else:
+                # otherwise move player down
                 self._player[0].move(
                     (
                         0,
@@ -268,20 +272,23 @@ class Level(object):
         player_bbox = player.bbox()
         window_width, window_height = self._game.dimensions
 
+        # when gravity is on, player is in the air, and is not jumping
         if (
             self._player_gravity
             and player_bbox[3] < window_height
             and not self._player_jumping
         ):
-            player.move([0, GRAVITY])
+            # make the player fall by GRAVITY pixels
+            player.move((0, GRAVITY))
 
+        # when player is stuck
         if self._player_stuck:
-            player.move([-SPEED, 0])
+            # move it with the rest of the sprites
+            player.move((-SPEED, 0))
 
-        if player_bbox[3] <= 0:
-            self._end = True
-
+        # when player is below the bottom of the window
         if player_bbox[3] >= window_height:
+            # move it up to to bottom
             player.teleport(
                 (
                     player_bbox[0],
@@ -289,39 +296,59 @@ class Level(object):
                 )
             )
 
+        # when the player exits the screen from the right
+        if player_bbox[2] <= 0:
+            # end the game
+            self._end = True
+
     def collide(self):
+        # reset player gravity
         self._player_stuck = False
+        # reset player stuck
         self._player_gravity = True
 
         for item in self._player[0].collide():
+            # end the game when player collides into an obstacle
             if item in self._obstacles_tags:
                 self._end = True
 
             if item in self._surfaces_tags:
+                # bounding box for the collided surface
                 surface = self._surfaces[self._surfaces_tags.index(item)].bbox()
+                # bounding box for player
                 player = self._player[0].bbox()
 
                 if player[2] <= surface[0]:
+                    # player is stuck when blocked by a surface
                     self._player_stuck = True
                 elif player[3] >= surface[1]:
+                    # turn off gravity when player is on surface
                     self._player_gravity = False
 
                     if not player[3] > surface[3]:
+                        # move player to top of surface unless it was below
                         self._player[0].teleport(
                             (player[0], surface[1] - (player[3] - player[1]))
                         )
                     else:
+                        # stop jumping if player was below
                         self._player_jumping = False
+                        # then turn on gravity
                         self._player_gravity = True
 
             if item in self._rewards_tags:
+                # destroy reward if player collided with it
                 reward = self._rewards[self._rewards_tags.index(item)]
                 reward.delete()
+                # give the player one point
                 self._player_points += 1
+                # remove the reward from rewards
                 del self._rewards[self._rewards_tags.index(item)]
+                # remove the reward tag form reward tags
                 del self._rewards_tags[self._rewards_tags.index(item)]
 
             if item in self._goal_tag:
+                # end game on contact with the goal
                 self._end = True
 
 
