@@ -19,6 +19,7 @@ LABEL_STYLE = {
     "font_size": 14,
 }
 
+
 class Label(object):
     def __init__(self, text, style={}):
         self._text = text
@@ -74,7 +75,7 @@ class Button(object):
             coords[0] + dimensions[0],
             coords[1] + dimensions[1],
             fill=fill,
-            outline=outline
+            outline=outline,
         )
 
         self._tag_text = game._canvas.create_text(
@@ -86,7 +87,9 @@ class Button(object):
         )
 
         def hover(event):
-            game._canvas.itemconfig(self._tag, fill=hover_fill, outline=hover_outline)
+            game._canvas.itemconfig(
+                self._tag, fill=hover_fill, outline=hover_outline
+            )
             game._canvas.itemconfig(self._tag_text, fill=hover_color)
 
             self._focused = True
@@ -95,7 +98,9 @@ class Button(object):
         game.on("<Enter>", tag=self._tag_text)(hover)
 
         def active(event):
-            game._canvas.itemconfig(self._tag, fill=active_fill, outline=active_outline)
+            game._canvas.itemconfig(
+                self._tag, fill=active_fill, outline=active_outline
+            )
             game._canvas.itemconfig(self._tag_text, fill=active_color)
 
         game.on("<Button-1>", tag=self._tag)(active)
@@ -151,17 +156,31 @@ class GUI(object):
                     widget.draw(
                         self._game,
                         (
-                            widget_width * widget_number + self._coords[0] + ((widget_width / 2) - (widget._style["dimensions"][0] / 2)),
-                            row_height * row_number + self._coords[1] + ((row_height / 2) - (widget._style["dimensions"][1] / 2)),
-                        )
+                            widget_width * widget_number
+                            + self._coords[0]
+                            + (
+                                (widget_width / 2)
+                                - (widget._style["dimensions"][0] / 2)
+                            ),
+                            row_height * row_number
+                            + self._coords[1]
+                            + (
+                                (row_height / 2)
+                                - (widget._style["dimensions"][1] / 2)
+                            ),
+                        ),
                     )
                 except KeyError:
                     widget.draw(
                         self._game,
                         (
-                            widget_width * widget_number + self._coords[0] + (widget_width / 2),
-                            row_height * row_number + self._coords[1] + (row_height / 2),
-                        )
+                            widget_width * widget_number
+                            + self._coords[0]
+                            + (widget_width / 2),
+                            row_height * row_number
+                            + self._coords[1]
+                            + (row_height / 2),
+                        ),
                     )
 
     def delete(self):

@@ -185,10 +185,7 @@ class Level(object):
 
     def player_jump(self):
         # when player is jumping and is not finished
-        if (
-            self._player_jumping
-            and self._player_jump_frames < JUMP_FRAMES
-        ):
+        if self._player_jumping and self._player_jump_frames < JUMP_FRAMES:
             # turn off gravity
             self._player_gravity = False
 

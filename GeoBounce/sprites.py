@@ -132,11 +132,7 @@ class ImageSprite(Sprite):
         self._coords[0] = coords[0]
         self._coords[1] = coords[1]
 
-        self._game._canvas.coords(
-            self._tag,
-            self._coords[0],
-            self._coords[1],
-        )
+        self._game._canvas.coords(self._tag, self._coords[0], self._coords[1])
 
     def collide(self):
         return self._game._canvas.find_overlapping(*self.bbox())
