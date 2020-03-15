@@ -231,9 +231,10 @@ class Level(object):
             self._player_jumping = True
 
         while not self._end:
+            self._timer.begin()
+
             self._current_coords += SPEED
 
-            self._timer.begin()
             self.move()
             self.player_jump()
             self.collide()
