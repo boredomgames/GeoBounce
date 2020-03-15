@@ -40,6 +40,23 @@ class Label(object):
             anchor="center",
         )
 
+    def update(self, game, text=None, style={}):
+        if text is not None:
+            self._text = text
+
+        self._style = {**self._style, **style}
+
+        color = self._style["color"]
+        font_family = self._style["font_family"]
+        font_size = self._style["font_size"]
+
+        game._canvas.itemconfig(
+            self._tag,
+            fill=color,
+            font=f"{font_family} {font_size}",
+            text=self._text,
+        )
+
     def delete(self, game):
         game._canvas.delete(self._tag)
 

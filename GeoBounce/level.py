@@ -1,3 +1,4 @@
+from .gui import GUI, Label
 from .sprites import (
     ImageSprite,
     LineSprite,
@@ -53,8 +54,10 @@ class Level(object):
         self._player_gravity = True
         self._player_points = 0
         self._player_jump_frames = 0
-        self._testmode = False
+        self._player_points_display = Label(f"Points: {self._player_points}")
+        self._gui = GUI(self._game, coords=(700, 10), dimensions=(100, 10), widgets=[[self._player_points_display]])
 
+        self._testmode = False
         self._end = False
         self._timer = Timer()
 
@@ -132,6 +135,8 @@ class Level(object):
             goal.draw()
             self._goal_tag.append(goal._tag)
 
+        self._gui.draw()
+
     def run(self):
         self._game.name = self._name
         self._game.dimensions = self._config["dimensions"]
@@ -147,12 +152,16 @@ class Level(object):
             self.player_jump()
             self.collide()
             self.player_move()
+            self.update_points()
             self._game.update()
 
             if self._testmode:
                 self._end = False
 
             self._timer.end(FPS)
+
+    def update_points(self):
+        self._player_points_display.update(self._game, text=f"Points: {self._player_points}")
 
     def delete(self):
         for obstacle in self._obstacles:
@@ -168,6 +177,7 @@ class Level(object):
             goal.delete()
 
         self._player[0].delete()
+        self._gui.delete()
 
     def move(self):
         for obstacle in self._obstacles:
