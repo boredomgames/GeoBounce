@@ -5,12 +5,7 @@ from .gui import GUI, Button, Label
 from .level import Level
 from .levels import level1, level2
 
-levels = [
-    {
-        "Level 1": level1,
-        "Level 2": level2,
-    }
-]
+levels = [{"Level 1": level1, "Level 2": level2}]
 
 
 class GeoBounce(object):
@@ -25,7 +20,10 @@ class GeoBounce(object):
             dimensions=(400, 590),
             widgets=[
                 [Label("GeoBounce", style={"font_size": 100})],
-                *[[generate_button(*item) for item in row.items()] for row in levels],
+                *[
+                    [generate_button(*item) for item in row.items()]
+                    for row in levels
+                ],
                 [
                     Label(
                         "Please come back later for more levels...",
