@@ -1,4 +1,4 @@
-from .gui import GUI, Label
+from .gui import GUI, Button, Label
 from .sprites import (
     ImageSprite,
     LineSprite,
@@ -54,8 +54,14 @@ class Level(object):
         self._player_gravity = True
         self._player_points = 0
         self._player_jump_frames = 0
+        self._player_dead = False
         self._player_points_display = Label(f"Points: {self._player_points}")
-        self._gui = GUI(self._game, coords=(700, 10), dimensions=(100, 10), widgets=[[self._player_points_display]])
+        self._gui = GUI(
+            self._game,
+            coords=(700, 10),
+            dimensions=(100, 10),
+            widgets=[[self._player_points_display]],
+        )
 
         self._testmode = False
         self._end = False
@@ -155,13 +161,54 @@ class Level(object):
             self.update_points()
             self._game.update()
 
-            if self._testmode:
+            if self._player_dead and self._testmode:
                 self._end = False
+                self._player_dead = False
 
             self._timer.end(FPS)
 
+        self.end_screen()
+
+        while not self._end:
+            self._game.update()
+
+    def end_screen(self):
+        self._end = False
+        self._gui.delete()
+
+        # needed for "Continue" button
+        def exit_level(event):
+            self._end = True
+
+        self._gui = GUI(
+            self._game,
+            coords=(50, 125),
+            dimensions=(700, 200),
+            widgets=[
+                [
+                    Label(
+                        "You Died" if self._player_dead else "You Won",
+                        style={"font_size": 75},
+                    )
+                ],
+                [
+                    Label(
+                        f"""You earned {self._player_points} {
+                            "point" if self._player_points == 1 else "points"
+                        }""",
+                        style={"font_size": 20},
+                    )
+                ],
+                [Button("Continue", command=exit_level)],
+            ],
+        )
+
+        self._gui.draw()
+
     def update_points(self):
-        self._player_points_display.update(self._game, text=f"Points: {self._player_points}")
+        self._player_points_display.update(
+            self._game, text=f"Points: {self._player_points}"
+        )
 
     def delete(self):
         for obstacle in self._obstacles:
@@ -260,6 +307,7 @@ class Level(object):
         for item in self._player[0].collide():
             # end the game when player collides into an obstacle
             if item in self._obstacles_tags:
+                self._player_dead = True
                 self._end = True
 
             if item in self._surfaces_tags:
