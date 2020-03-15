@@ -5,9 +5,19 @@ from .gui import GUI, Button, Label
 from .level import Level
 from .levels import level1, level2
 
+levels = [
+    {
+        "Level 1": level1,
+        "Level 2": level2,
+    }
+]
+
 
 class GeoBounce(object):
-    def __init__(self):
+    def __init__(self, levels):
+        def generate_button(name, level):
+            return Button(name, command=lambda e: self.run_level(name, level))
+
         self._game = Game()
         self._gui = GUI(
             self._game,
@@ -15,16 +25,7 @@ class GeoBounce(object):
             dimensions=(400, 590),
             widgets=[
                 [Label("GeoBounce", style={"font_size": 100})],
-                [
-                    Button(
-                        "Level 1",
-                        command=lambda e: self.run_level("Level 1", level1),
-                    ),
-                    Button(
-                        "Level 2",
-                        command=lambda e: self.run_level("Level 2", level2),
-                    ),
-                ],
+                *[[generate_button(*item) for item in row.items()] for row in levels],
                 [
                     Label(
                         "Please come back later for more levels...",
@@ -52,5 +53,5 @@ class GeoBounce(object):
 
 
 if __name__ == "__main__":
-    game = GeoBounce()
+    game = GeoBounce(levels)
     game.run()
