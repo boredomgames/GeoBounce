@@ -237,7 +237,7 @@ class Level(object):
             player.move((-SPEED, 0))
 
         # when player is below the bottom of the window
-        if player_bbox[3] >= window_height:
+        if player_bbox[3] > window_height:
             # move it up to to bottom
             player.teleport(
                 (
