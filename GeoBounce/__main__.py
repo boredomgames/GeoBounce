@@ -2,8 +2,10 @@ import sys
 
 from .game import GAME_NAME, Game
 from .gui import GUI, Button, Label
-from .level import Level
+from .level import Level, LevelOptimized
 from .levels import level1, level2
+
+LEVEL_OPTIMIZED = False
 
 levels = [{"Level 1": level1, "Level 2": level2}]
 
@@ -40,7 +42,11 @@ class GeoBounce(object):
     def run_level(self, name, level):
         self._gui.delete()
 
-        level = Level(self._game, name, level)
+        if LEVEL_OPTIMIZED:
+            level = LevelOptimized(self._game, name, level)
+        else:
+            level = Level(self._game, name, level)
+
         level.generate()
         level.draw()
         level.run()
