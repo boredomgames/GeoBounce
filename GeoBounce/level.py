@@ -297,6 +297,8 @@ class Level(object):
         if player_bbox[2] <= 0:
             # end the game
             self._end = True
+            # player is dead
+            self._player_dead = True
 
     def collide(self):
         # reset player gravity
