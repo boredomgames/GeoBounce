@@ -3,9 +3,7 @@ import sys
 from .game import GAME_NAME, Game
 from .gui import GUI, Button, Label
 from .level import Level
-from .levels import level1, level2
-
-levels = [{"Level 1": level1, "Level 2": level2}]
+from .levels import LEVELS
 
 
 class GeoBounce(object):
@@ -51,5 +49,5 @@ class GeoBounce(object):
 
 
 if __name__ == "__main__":
-    game = GeoBounce(levels)
+    game = GeoBounce(LEVELS)
     game.run()
