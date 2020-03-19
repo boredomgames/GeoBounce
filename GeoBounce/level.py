@@ -155,9 +155,9 @@ class Level(object):
         while not self._end:
             self._timer.begin()
             self.move()
+            self.player_move()
             self.player_jump()
             self.collide()
-            self.player_move()
             self.update_points()
             self._game.update()
 
@@ -318,23 +318,39 @@ class Level(object):
                 # bounding box for player
                 player = self._player[0].bbox()
 
-                if player[2] <= surface[0]:
-                    # player is stuck when blocked by a surface
+                if player[2] >= surface[0] and player[0] < surface[0]:
+                    # player is blocked by the surface and not completely in it
+
+                    # make sure player is not in surface by moving it out
+                    self._player[0].teleport(
+                        (surface[0] - (player[2] - player[0]), player[1])
+                    )
+
+                    # player is stuck
                     self._player_stuck = True
                 elif player[3] >= surface[1]:
-                    # turn off gravity when player is on surface
+                    # player is on the surface
+
+                    # turn off gravity to prevent falling
                     self._player_gravity = False
 
-                    if not player[3] > surface[3]:
-                        # move player to top of surface unless it was below
+                    if player[3] < surface[3] and player[1] < surface[1]:
+                        # player is on top of surface
+
+                        # make sure player is not in surface by moving it up
                         self._player[0].teleport(
                             (player[0], surface[1] - (player[3] - player[1]))
                         )
                     else:
+                        # player is below or completely inside surface
+
                         # stop jumping if player was below
                         self._player_jumping = False
                         # then turn on gravity
                         self._player_gravity = True
+
+                        # make sure player is not in surface by moving it down
+                        self._player[0].teleport((player[0], surface[3]))
 
             if item in self._rewards_tags:
                 # destroy reward if player collided with it
