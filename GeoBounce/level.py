@@ -19,7 +19,7 @@ SPRITE_TYPES = {
     "polygon": PolygonSprite,
 }
 
-JUMP_PATH = (12, 11, 10, 9, 8, 7, 6, 5, 0, 0, 0)
+JUMP_PATH = (12, 11, 10, 9, 8, 7, 6, 5, 0, 0)
 
 JUMP_FRAMES = len(JUMP_PATH) * 2
 FPS = 60
