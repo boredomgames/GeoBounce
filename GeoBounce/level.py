@@ -63,7 +63,7 @@ class Level(object):
             widgets=[[self._player_points_display]],
         )
 
-        self._testmode = False
+        self._test_mode = False
         self._end = False
         self._timer = Timer()
 
@@ -123,23 +123,23 @@ class Level(object):
     def draw(self):
         for obstacle in self._obstacles:
             obstacle.draw()
-            self._obstacles_tags.append(obstacle._tag)
+            self._obstacles_tags.append(obstacle.tag)
 
         for surface in self._surfaces:
             surface.draw()
-            self._surfaces_tags.append(surface._tag)
+            self._surfaces_tags.append(surface.tag)
 
         for reward in self._rewards:
             reward.draw()
-            self._rewards_tags.append(reward._tag)
+            self._rewards_tags.append(reward.tag)
 
         for player in self._player:
             player.draw()
-            self._player_tag.append(player._tag)
+            self._player_tag.append(player.tag)
 
         for goal in self._goal:
             goal.draw()
-            self._goal_tag.append(goal._tag)
+            self._goal_tag.append(goal.tag)
 
         self._gui.draw()
 
@@ -161,7 +161,7 @@ class Level(object):
             self.update_points()
             self._game.update()
 
-            if self._player_dead and self._testmode:
+            if self._player_dead and self._test_mode:
                 self._end = False
                 self._player_dead = False
 
@@ -318,7 +318,7 @@ class Level(object):
                 # bounding box for player
                 player = self._player[0].bbox()
 
-                if player[2] >= surface[0] and player[0] < surface[0]:
+                if player[2] >= surface[0] > player[0]:
                     # player is blocked by the surface and not completely in it
 
                     # make sure player is not in surface by moving it out

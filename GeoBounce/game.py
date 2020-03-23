@@ -24,6 +24,9 @@ class Game(object):
         self._canvas = Canvas(self._window, highlightthickness=0)
         self._canvas.pack(anchor="center", fill="both", expand=True)
 
+        # public canvas
+        self.canvas = self._canvas
+
         # watch window resize
         @self.on(event="<Configure>")
         def resize(*args):
