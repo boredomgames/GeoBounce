@@ -132,6 +132,9 @@ dmypy.json
 # Sublime Text Configuration
 .subl/
 
+# PyCharm Configuration
+.idea/
+
 # Repl.it bashrc
 .bashrc
 .replit
