@@ -60,7 +60,7 @@ level1 = [
         "type": "reward",
         "sprite_type": "image",
         "image": coin_image,
-        "coords": (1220, 550),
+        "coords": (1220, 555),
         "dimensions": (20, 20),
     },
     {
@@ -75,7 +75,7 @@ level1 = [
         "type": "reward",
         "sprite_type": "image",
         "image": coin_image,
-        "coords": (1320, 530),
+        "coords": (1320, 535),
         "dimensions": (20, 20),
     },
     {
@@ -90,7 +90,7 @@ level1 = [
         "type": "reward",
         "sprite_type": "image",
         "image": coin_image,
-        "coords": (1420, 510),
+        "coords": (1420, 515),
         "dimensions": (20, 20),
     },
     {
@@ -105,7 +105,7 @@ level1 = [
         "type": "reward",
         "sprite_type": "image",
         "image": coin_image,
-        "coords": (1520, 530),
+        "coords": (1520, 535),
         "dimensions": (20, 20),
     },
     {
