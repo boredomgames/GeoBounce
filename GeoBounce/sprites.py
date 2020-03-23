@@ -25,24 +25,34 @@ class Image(object):
         if tuple(dimensions) != (None, None):
             self.resize(dimensions)
 
-        self._tkimage = PILImageTk.PhotoImage(self._image)
+        self._tk_image = None
 
     def resize(self, dimensions):
         self._image = self._image.resize(dimensions)
-        self._tkimage = PILImageTk.PhotoImage(self._image)
 
-    def tkimage(self):
-        return self._tkimage
+        try:
+            self._tk_image = PILImageTk.PhotoImage(self._image)
+        except RuntimeError:
+            self._tk_image = None
+
+    def tk_image(self):
+        if self._tk_image is None:
+            try:
+                self._tk_image = PILImageTk.PhotoImage(self._image)
+            except RuntimeError:
+                self._tk_image = None
+
+        return self._tk_image
 
 
 class Sprite(object):
     def __init__(self, game, coords):
         self._game = game
         self._coords = list(coords)
-        self._tag = None
+        self.tag = None
 
     def call(self, command):  # unsafe?
-        exec(f"self._game._canvas.({self._tag}, {command})")
+        exec(f"self._game.canvas.({self.tag}, {command})")
 
 
 class RectangleSprite(Sprite):
@@ -56,7 +66,7 @@ class RectangleSprite(Sprite):
         self._outline = outline
 
     def draw(self):
-        self._tag = self._game._canvas.create_rectangle(
+        self.tag = self._game.canvas.create_rectangle(
             self._coords[0],
             self._coords[1],
             self._dimensions[0] + self._coords[0],
@@ -69,14 +79,14 @@ class RectangleSprite(Sprite):
         self._coords[0] += coords[0]
         self._coords[1] += coords[1]
 
-        self._game._canvas.move(self._tag, *coords)
+        self._game.canvas.move(self.tag, *coords)
 
     def teleport(self, coords):
         self._coords[0] = coords[0]
         self._coords[1] = coords[1]
 
-        self._game._canvas.coords(
-            self._tag,
+        self._game.canvas.coords(
+            self.tag,
             self._coords[0],
             self._coords[1],
             self._dimensions[0] + self._coords[0],
@@ -84,11 +94,11 @@ class RectangleSprite(Sprite):
         )
 
     def collide(self):
-        return self._game._canvas.find_overlapping(*self.bbox())
+        return self._game.canvas.find_overlapping(*self.bbox())
 
     def delete(self):
-        self._game._canvas.delete(self._tag)
-        self._tag = None
+        self._game.canvas.delete(self.tag)
+        self.tag = None
 
     def position(self):
         return self._coords
@@ -106,7 +116,7 @@ class ImageSprite(Sprite):
     def __init__(self, game, coords, dimensions, image):
         super().__init__(game, coords)
 
-        self._dimensions = dimensions
+        self._dimensions = list(dimensions)
 
         if isinstance(image, str):
             self._image = Image(image, dimensions=self._dimensions)
@@ -115,10 +125,10 @@ class ImageSprite(Sprite):
 
     def draw(self):
         # DO NOT EDIT: Hack required to compensate for image alignment bug
-        self._tag = self._game._canvas.create_image(
+        self.tag = self._game.canvas.create_image(
             self._coords[0],
             self._coords[1],
-            image=self._image.tkimage()
+            image=self._image.tk_image()
             if isinstance(self._image, Image)
             else self._image,
             anchor="nw",
@@ -128,20 +138,20 @@ class ImageSprite(Sprite):
         self._coords[0] += coords[0]
         self._coords[1] += coords[1]
 
-        self._game._canvas.move(self._tag, *coords)
+        self._game.canvas.move(self.tag, *coords)
 
     def teleport(self, coords):
         self._coords[0] = coords[0]
         self._coords[1] = coords[1]
 
-        self._game._canvas.coords(self._tag, self._coords[0], self._coords[1])
+        self._game.canvas.coords(self.tag, self._coords[0], self._coords[1])
 
     def collide(self):
-        return self._game._canvas.find_overlapping(*self.bbox())
+        return self._game.canvas.find_overlapping(*self.bbox())
 
     def delete(self):
-        self._game._canvas.delete(self._tag)
-        self._tag = None
+        self._game.canvas.delete(self.tag)
+        self.tag = None
 
     def position(self):
         return self._coords
@@ -161,12 +171,12 @@ class OvalSprite(Sprite):
     ):
         super().__init__(game, coords)
 
-        self._dimensions = dimensions
+        self._dimensions = list(dimensions)
         self._fill = fill
         self._outline = outline
 
     def draw(self):
-        self._tag = self._game._canvas.create_rectangle(
+        self.tag = self._game.canvas.create_rectangle(
             self._coords,
             [x[0] + x[1] for x in zip(self._dimensions, self._coords)],
             fill=self._fill,
@@ -177,14 +187,14 @@ class OvalSprite(Sprite):
         self._coords[0] += coords[0]
         self._coords[1] += coords[1]
 
-        self._game._canvas.move(self._tag, *coords)
+        self._game.canvas.move(self.tag, *coords)
 
     def teleport(self, coords):
         self._coords[0] = coords[0]
         self._coords[1] = coords[1]
 
-        self._game._canvas.coords(
-            self._tag,
+        self._game.canvas.coords(
+            self.tag,
             self._coords[0],
             self._coords[1],
             self._dimensions[0] + self._coords[0],
@@ -192,11 +202,11 @@ class OvalSprite(Sprite):
         )
 
     def collide(self):
-        return self._game._canvas.find_overlapping(*self.bbox())
+        return self._game.canvas.find_overlapping(*self.bbox())
 
     def delete(self):
-        self._game._canvas.delete(self._tag)
-        self._tag = None
+        self._game.canvas.delete(self.tag)
+        self.tag = None
 
     def position(self):
         return self._coords
@@ -218,7 +228,7 @@ class LineSprite(Sprite):
         self._fill = fill
 
     def draw(self):
-        self._tag = self._game._canvas.create_line(
+        self.tag = self._game.canvas.create_line(
             self._coords, fill=self._fill
         )
 
@@ -228,7 +238,7 @@ class LineSprite(Sprite):
         self._coords[2] += coords[0]
         self._coords[3] += coords[1]
 
-        self._game._canvas.move(self._tag, *coords)
+        self._game.canvas.move(self.tag, *coords)
 
     def teleport(self, coords):
         x = min(self._coords[0], self._coords[2])
@@ -239,20 +249,20 @@ class LineSprite(Sprite):
         self._coords[2] += coords[0] - x
         self._coords[3] += coords[1] - y
 
-        self._game._canvas.move(self._tag, coords[0] - x, coords[1] - y)
+        self._game.canvas.move(self.tag, coords[0] - x, coords[1] - y)
 
     def collide(self):
-        return self._game._canvas.find_overlapping(*self.bbox())
+        return self._game.canvas.find_overlapping(*self.bbox())
 
     def delete(self):
-        self._game._canvas.delete(self._tag)
-        self._tag = None
+        self._game.canvas.delete(self.tag)
+        self.tag = None
 
     def position(self):
         x = min(self._coords[0], self._coords[2])
         y = min(self._coords[1], self._coords[3])
 
-        return (x, y)
+        return x, y
 
     def bbox(self):
         x_min = min(self._coords[0], self._coords[2])
@@ -260,7 +270,7 @@ class LineSprite(Sprite):
         x_max = max(self._coords[0], self._coords[2])
         y_max = max(self._coords[1], self._coords[3])
 
-        return (x_min, y_min, x_max, y_max)
+        return x_min, y_min, x_max, y_max
 
 
 class PolygonSprite(Sprite):
@@ -271,7 +281,7 @@ class PolygonSprite(Sprite):
         self._outline = outline
 
     def draw(self):
-        self._tag = self._game._canvas.create_polygon(
+        self.tag = self._game.canvas.create_polygon(
             self._coords, fill=self._fill, outline=self._outline
         )
 
@@ -284,7 +294,7 @@ class PolygonSprite(Sprite):
 
         self._coords = coords_new
 
-        self._game._canvas.move(self._tag, *coords)
+        self._game.canvas.move(self.tag, *coords)
 
     def teleport(self, coords):
         coords_new = []
@@ -294,20 +304,20 @@ class PolygonSprite(Sprite):
 
         for x_item, y_item in grouper(self._coords, 2):
             coords_new.append(x_item + (coords[0] - x))
-            coords_new.append(y_item + (coords[1] - x))
+            coords_new.append(y_item + (coords[1] - y))
 
         self._coords = coords_new
 
-        self._game._canvas.coords(self._tag, *coords_new)
+        self._game.canvas.coords(self.tag, *coords_new)
 
     def collide(self):
-        return self._game._canvas.find_overlapping(*self.bbox())
+        return self._game.canvas.find_overlapping(*self.bbox())
 
     def position(self):
         x = min(item[0] for item in grouper(self._coords, 2))
         y = min(item[0] for item in grouper(self._coords, 2))
 
-        return (x, y)
+        return x, y
 
     def bbox(self):
         x_min = min(item[0] for item in grouper(self._coords, 2))
@@ -315,4 +325,4 @@ class PolygonSprite(Sprite):
         x_max = max(item[0] for item in grouper(self._coords, 2))
         y_max = max(item[0] for item in grouper(self._coords, 2))
 
-        return (x_min, y_min, x_max, y_max)
+        return x_min, y_min, x_max, y_max

@@ -24,14 +24,14 @@ class Label(object):
     def __init__(self, text, style={}):
         self._text = text
         self._tag = None
-        self._style = {**LABEL_STYLE, **style}
+        self.style = {**LABEL_STYLE, **style}
 
     def draw(self, game, coords):
-        color = self._style["color"]
-        font_family = self._style["font_family"]
-        font_size = self._style["font_size"]
+        color = self.style["color"]
+        font_family = self.style["font_family"]
+        font_size = self.style["font_size"]
 
-        self._tag = game._canvas.create_text(
+        self._tag = game.canvas.create_text(
             coords,
             fill=color,
             font=f"{font_family} {font_size}",
@@ -44,13 +44,13 @@ class Label(object):
         if text is not None:
             self._text = text
 
-        self._style = {**self._style, **style}
+        self.style = {**self.style, **style}
 
-        color = self._style["color"]
-        font_family = self._style["font_family"]
-        font_size = self._style["font_size"]
+        color = self.style["color"]
+        font_family = self.style["font_family"]
+        font_size = self.style["font_size"]
 
-        game._canvas.itemconfig(
+        game.canvas.itemconfig(
             self._tag,
             fill=color,
             font=f"{font_family} {font_size}",
@@ -58,7 +58,7 @@ class Label(object):
         )
 
     def delete(self, game):
-        game._canvas.delete(self._tag)
+        game.canvas.delete(self._tag)
 
         self._tag = None
 
@@ -70,23 +70,23 @@ class Button(object):
         self._tag = None
         self._tag_text = None
         self._focused = False
-        self._style = {**BUTTON_STYLE, **style}
+        self.style = {**BUTTON_STYLE, **style}
 
     def draw(self, game, coords):
-        fill = self._style["fill"]
-        outline = self._style["outline"]
-        color = self._style["color"]
-        dimensions = self._style["dimensions"]
-        hover_fill = self._style["hover_fill"]
-        hover_outline = self._style["hover_outline"]
-        hover_color = self._style["hover_color"]
-        active_fill = self._style["active_fill"]
-        active_outline = self._style["active_outline"]
-        active_color = self._style["active_color"]
-        font_family = self._style["font_family"]
-        font_size = self._style["font_size"]
+        fill = self.style["fill"]
+        outline = self.style["outline"]
+        color = self.style["color"]
+        dimensions = self.style["dimensions"]
+        hover_fill = self.style["hover_fill"]
+        hover_outline = self.style["hover_outline"]
+        hover_color = self.style["hover_color"]
+        active_fill = self.style["active_fill"]
+        active_outline = self.style["active_outline"]
+        active_color = self.style["active_color"]
+        font_family = self.style["font_family"]
+        font_size = self.style["font_size"]
 
-        self._tag = game._canvas.create_rectangle(
+        self._tag = game.canvas.create_rectangle(
             coords[0],
             coords[1],
             coords[0] + dimensions[0],
@@ -95,7 +95,7 @@ class Button(object):
             outline=outline,
         )
 
-        self._tag_text = game._canvas.create_text(
+        self._tag_text = game.canvas.create_text(
             dimensions[0] / 2 + coords[0],
             dimensions[1] / 2 + coords[1],
             fill=color,
@@ -104,10 +104,10 @@ class Button(object):
         )
 
         def hover(event):
-            game._canvas.itemconfig(
+            game.canvas.itemconfig(
                 self._tag, fill=hover_fill, outline=hover_outline
             )
-            game._canvas.itemconfig(self._tag_text, fill=hover_color)
+            game.canvas.itemconfig(self._tag_text, fill=hover_color)
 
             self._focused = True
 
@@ -115,17 +115,17 @@ class Button(object):
         game.on("<Enter>", tag=self._tag_text)(hover)
 
         def active(event):
-            game._canvas.itemconfig(
+            game.canvas.itemconfig(
                 self._tag, fill=active_fill, outline=active_outline
             )
-            game._canvas.itemconfig(self._tag_text, fill=active_color)
+            game.canvas.itemconfig(self._tag_text, fill=active_color)
 
         game.on("<Button-1>", tag=self._tag)(active)
         game.on("<Button-1>", tag=self._tag_text)(active)
 
         def blur(event):
-            game._canvas.itemconfig(self._tag, fill=fill, outline=outline)
-            game._canvas.itemconfig(self._tag_text, fill=color)
+            game.canvas.itemconfig(self._tag, fill=fill, outline=outline)
+            game.canvas.itemconfig(self._tag_text, fill=color)
 
             self._focused = False
 
@@ -140,8 +140,8 @@ class Button(object):
         game.on("<ButtonRelease-1>", tag=self._tag_text)(press)
 
     def delete(self, game):
-        game._canvas.delete(self._tag)
-        game._canvas.delete(self._tag_text)
+        game.canvas.delete(self._tag)
+        game.canvas.delete(self._tag_text)
 
         self._tag = None
         self._tag_text = None
@@ -177,13 +177,13 @@ class GUI(object):
                             + self._coords[0]
                             + (
                                 (widget_width / 2)
-                                - (widget._style["dimensions"][0] / 2)
+                                - (widget.style["dimensions"][0] / 2)
                             ),
                             row_height * row_number
                             + self._coords[1]
                             + (
                                 (row_height / 2)
-                                - (widget._style["dimensions"][1] / 2)
+                                - (widget.style["dimensions"][1] / 2)
                             ),
                         ),
                     )

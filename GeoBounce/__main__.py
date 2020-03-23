@@ -51,3 +51,4 @@ class GeoBounce(object):
 if __name__ == "__main__":
     game = GeoBounce(LEVELS)
     game.run()
+    sys.exit()
