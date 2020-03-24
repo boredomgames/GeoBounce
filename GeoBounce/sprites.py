@@ -228,9 +228,7 @@ class LineSprite(Sprite):
         self._fill = fill
 
     def draw(self):
-        self.tag = self._game.canvas.create_line(
-            self._coords, fill=self._fill
-        )
+        self.tag = self._game.canvas.create_line(self._coords, fill=self._fill)
 
     def move(self, coords):
         self._coords[0] += coords[0]
