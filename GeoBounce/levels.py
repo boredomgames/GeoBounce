@@ -248,13 +248,6 @@ level2 = [
         "dimensions": (20, 20),
     },
     {
-        "type": "obstacle",
-        "sprite_type": "image",
-        "image": spike_image,
-        "coords": (945, 580),
-        "dimensions": (20, 20),
-    },
-    {
         "type": "surface",
         "sprite_type": "rectangle",
         "coords": (950, 400),
