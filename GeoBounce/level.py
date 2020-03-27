@@ -1,249 +1,368 @@
-from .sprites import Obstacle, Surface, Player, Reward
+from .gui import GUI, Button, Label
+from .sprites import (
+    ImageSprite,
+    LineSprite,
+    OvalSprite,
+    PolygonSprite,
+    RectangleSprite,
+)
 from .timer import Timer
 
-from tkinter import messagebox
-
-
-# low
-# SPEED = 10
-# GRAVITY = 30
-
-# high
 SPEED = 5
 GRAVITY = 15
 
+SPRITE_TYPES = {
+    "rectangle": RectangleSprite,
+    "image": ImageSprite,
+    "oval": OvalSprite,
+    "line": LineSprite,
+    "polygon": PolygonSprite,
+}
+
+JUMP_PATH = (12, 11, 10, 9, 8, 7, 6, 5, 0, 0)
+
+JUMP_FRAMES = len(JUMP_PATH) * 2
+FPS = 60
+
 
 class Level(object):
-    def __init__(self, game, name, items):
-        self._name = name
-        self._items = items
+    def __init__(
+        self,
+        game,
+        name,
+        items,
+        config={"dimensions": [800, 600], "resizable": False},
+    ):
         self._game = game
-        self._sprites = {
-            "obstacles": [],
-            "obstacles_tags": [],
-            "surfaces": [],
-            "surfaces_tags": [],
-            "rewards": [],
-            "rewards_tags": [],
-            "player": None,
-            "player_tag": None,
-        }
+        self._name = name
+        self._config = config
+        self._items = items
 
-        self._points_display = None
+        self._obstacles = []
+        self._obstacles_tags = []
+        self._surfaces = []
+        self._surfaces_tags = []
+        self._rewards = []
+        self._rewards_tags = []
+        self._player = []
+        self._player_tag = []
+        self._goal = []
+        self._goal_tag = []
+
+        self._player_jumping = False
+        self._player_stuck = False
         self._player_gravity = True
-        self._player_move = True
         self._player_points = 0
-        self._end = False
-        self._testmode = False
-        self._askclose = True
-        self._timer = Timer()
-
-    def initialize(self):
-        for item in self._items:
-            if item["type"] == "obstacle":
-                self._sprites["obstacles"].append(
-                    Obstacle(
-                        self._game,
-                        position=item["position"],
-                        dimensions=item["dimensions"],
-                        color=item["color"],
-                    )
-                )
-                self._sprites["obstacles"][-1].draw()
-                self._sprites["obstacles_tags"].append(
-                    self._sprites["obstacles"][-1]._tag
-                )
-            elif item["type"] == "surface":
-                self._sprites["surfaces"].append(
-                    Surface(
-                        self._game,
-                        position=item["position"],
-                        dimensions=item["dimensions"],
-                        color=item["color"],
-                    )
-                )
-                self._sprites["surfaces"][-1].draw()
-                self._sprites["surfaces_tags"].append(
-                    self._sprites["surfaces"][-1]._tag
-                )
-            elif item["type"] == "reward":
-                self._sprites["rewards"].append(
-                    Reward(
-                        self._game,
-                        position=item["position"],
-                        dimensions=item["dimensions"],
-                        color=item["color"],
-                    )
-                )
-                self._sprites["rewards"][-1].draw()
-                self._sprites["rewards_tags"].append(
-                    self._sprites["rewards"][-1]._tag
-                )
-            elif item["type"] == "player":
-                self._sprites["player"] = Player(
-                    self._game,
-                    position=item["position"],
-                    dimensions=item["dimensions"],
-                    color=item["color"],
-                )
-                self._sprites["player"].draw()
-                self._sprites["player_tag"] = self._sprites["player"]._tag
-
-        self._points_display = self._game._canvas.create_text(
-            720, 20, text=f"Score: {self._player_points}", font="sans-serif"
+        self._player_jump_frames = 0
+        self._player_dead = False
+        self._player_points_display = Label(f"Points: {self._player_points}")
+        self._gui = GUI(
+            self._game,
+            coords=(700, 10),
+            dimensions=(100, 10),
+            widgets=[[self._player_points_display]],
         )
 
-        def event_close():
-            if self._askclose and messagebox.askokcancel("Quit", "Do you want to quit?"):
-                self._game.terminate()
-            elif not self._askclose:
-                self._game.terminate()
+        self._test_mode = False
+        self._end = False
+        self._timer = Timer()
 
-        self._game._window.protocol("WM_DELETE_WINDOW", event_close)
+    def generate(self):
+        for item in self._items:
+            self.generate_sprite(item)
+
+    def generate_sprite(self, item):
+        types = {
+            "obstacle": self._obstacles,
+            "surface": self._surfaces,
+            "reward": self._rewards,
+            "player": self._player,
+            "goal": self._goal,
+        }
+
+        if item["sprite_type"] in ("rectangle", "oval"):
+            types[item["type"]].append(
+                SPRITE_TYPES[item["sprite_type"]](
+                    self._game,
+                    coords=item["coords"],
+                    dimensions=item["dimensions"],
+                    fill=item["fill"],
+                    outline=item["outline"],
+                )
+            )
+        elif item["sprite_type"] == "image":
+            types[item["type"]].append(
+                SPRITE_TYPES[item["sprite_type"]](
+                    self._game,
+                    coords=item["coords"],
+                    dimensions=item["dimensions"],
+                    image=item["image"],
+                )
+            )
+        elif item["sprite_type"] == "line":
+            types[item["type"]].append(
+                SPRITE_TYPES[item["sprite_type"]](
+                    self._game,
+                    coords=item["coords"],
+                    width=item["width"],
+                    fill=item["fill"],
+                )
+            )
+        elif item["sprite_type"] == "polygon":
+            types[item["type"]].append(
+                SPRITE_TYPES[item["sprite_type"]](
+                    self._game,
+                    coords=item["coords"],
+                    fill=item["fill"],
+                    outline=item["outline"],
+                )
+            )
+        else:
+            raise ValueError(f'{item["sprite_type"]} is not a sprite type')
+
+    def draw(self):
+        for obstacle in self._obstacles:
+            obstacle.draw()
+            self._obstacles_tags.append(obstacle.tag)
+
+        for surface in self._surfaces:
+            surface.draw()
+            self._surfaces_tags.append(surface.tag)
+
+        for reward in self._rewards:
+            reward.draw()
+            self._rewards_tags.append(reward.tag)
+
+        for player in self._player:
+            player.draw()
+            self._player_tag.append(player.tag)
+
+        for goal in self._goal:
+            goal.draw()
+            self._goal_tag.append(goal.tag)
+
+        self._gui.draw()
 
     def run(self):
-        self._game.play()
+        self._game.name = self._name
+        self._game.dimensions = self._config["dimensions"]
+        self._game.resizable = self._config["resizable"]
 
-        while not self._end or self._testmode:
+        @self._game.on("<space>")
+        def event_space(event):
+            self._player_jumping = True
+
+        while not self._end:
             self._timer.begin()
+            self.move()
+            self.player_move()
+            self.player_jump()
+            self.collide()
+            self.update_points()
+            self._game.update()
 
-            for item in self._sprites["obstacles"]:
-                item.move([-SPEED, 0])
+            if self._player_dead and self._test_mode:
+                self._end = False
+                self._player_dead = False
 
-            for item in self._sprites["surfaces"]:
-                item.move([-SPEED, 0])
+            self._timer.end(FPS)
 
-            for item in self._sprites["rewards"]:
-                item.move([-SPEED, 0])
+        self.end_screen()
 
-            self._sprites["player"].run_jump()
-            self.check_collide()
+        while not self._end:
+            self._game.update()
 
-            if (
-                self._player_gravity == True
-                and self._sprites["player"]._coords[1]
-                + self._sprites["player"]._dimensions[1]
-                < 600
-                and self._sprites["player"].jumping == False
-            ):  # allow the player to fall if it can fall, is not at the bottom, and is not jumping
-                self._sprites["player"].move([0, GRAVITY])
+    def end_screen(self):
+        self._end = False
+        self._gui.delete()
 
-            if (
-                self._player_move == False
-            ):  # move the player with the obstacles if it is blocked
-                self._sprites["player"].move([-SPEED, 0])
+        # needed for "Continue" button
+        def exit_level(event):
+            self._end = True
 
-            if (
-                self._sprites["player"]._coords[0]
-                + self._sprites["player"]._dimensions[0]
-                <= 0
-            ):  # end the game when the player exits the screen
-                self._end = True
+        self._gui = GUI(
+            self._game,
+            coords=(50, 125),
+            dimensions=(700, 200),
+            widgets=[
+                [
+                    Label(
+                        "You Died" if self._player_dead else "You Won",
+                        style={"font_size": 75},
+                    )
+                ],
+                [
+                    Label(
+                        f"""You earned {self._player_points} {
+                            "point" if self._player_points == 1 else "points"
+                        }""",
+                        style={"font_size": 20},
+                    )
+                ],
+                [Button("Continue", command=exit_level)],
+            ],
+        )
 
-            if (
-                self._sprites["player"]._coords[1]
-                + self._sprites["player"]._dimensions[1]
-                >= 600
-            ):  # move the player back to the ground if it falls through (due to jumping)
-                self._sprites["player"].teleport(
-                    [
-                        self._sprites["player"]._coords[0],
-                        600 - self._sprites["player"]._dimensions[1],
-                    ]
+        self._gui.draw()
+
+    def update_points(self):
+        self._player_points_display.update(
+            self._game, text=f"Points: {self._player_points}"
+        )
+
+    def delete(self):
+        for obstacle in self._obstacles:
+            obstacle.delete()
+
+        for surface in self._surfaces:
+            surface.delete()
+
+        for reward in self._rewards:
+            reward.delete()
+
+        for goal in self._goal:
+            goal.delete()
+
+        self._player[0].delete()
+        self._gui.delete()
+
+    def move(self):
+        for obstacle in self._obstacles:
+            obstacle.move((-SPEED, 0))
+
+        for surface in self._surfaces:
+            surface.move((-SPEED, 0))
+
+        for reward in self._rewards:
+            reward.move((-SPEED, 0))
+
+        for goal in self._goal:
+            goal.move((-SPEED, 0))
+
+    def player_jump(self):
+        # when player is jumping and is not finished
+        if self._player_jumping and self._player_jump_frames < JUMP_FRAMES:
+            # turn off gravity
+            self._player_gravity = False
+
+            if self._player_jump_frames < JUMP_FRAMES / 2:
+                # move player up if it is less than halfway through
+                self._player[0].move((0, -JUMP_PATH[self._player_jump_frames]))
+            else:
+                # otherwise move player down
+                self._player[0].move(
+                    (
+                        0,
+                        JUMP_PATH[
+                            int(JUMP_FRAMES / 2) - self._player_jump_frames
+                        ],
+                    )
                 )
 
-            for sprite in self._sprites["obstacles"]:
-                if sprite._coords[0] + sprite._dimensions[0] <= 0:
-                    sprite.delete()
+            self._player_jump_frames += 1
+        else:
+            self._player_jump_frames = 0
+            self._player_jumping = False
 
-            for sprite in self._sprites["surfaces"]:
-                if sprite._coords[0] + sprite._dimensions[0] <= 0:
-                    sprite.delete()
+    def player_move(self):
+        player = self._player[0]
+        player_bbox = player.bbox()
+        window_width, window_height = self._game.dimensions
 
-            for sprite in self._sprites["rewards"]:
-                if sprite._coords[0] + sprite._dimensions[0] <= 0:
-                    sprite.delete()
+        # when gravity is on, player is in the air, and is not jumping
+        if (
+            self._player_gravity
+            and player_bbox[3] < window_height
+            and not self._player_jumping
+        ):
+            # make the player fall by GRAVITY pixels
+            player.move((0, GRAVITY))
 
-            self._game._canvas.itemconfig(
-                self._points_display,
-                text=f"Score: {self._player_points}",
-                font="sans-serif",
+        # when player is stuck
+        if self._player_stuck:
+            # move it with the rest of the sprites
+            player.move((-SPEED, 0))
+
+        # when player is below the bottom of the window
+        if player_bbox[3] > window_height:
+            # move it up to to bottom
+            player.teleport(
+                (
+                    player_bbox[0],
+                    window_height - (player_bbox[3] - player_bbox[1]),
+                )
             )
 
-            if len(self._game._canvas.find_all()) == 2:
-                break
+        # when the player exits the screen from the right
+        if player_bbox[2] <= 0:
+            # end the game
+            self._end = True
+            # player is dead
+            self._player_dead = True
 
-            self._game.update()
-
-            # low
-            # self._timer.end(30)
-
-            # high
-            self._timer.end(60)
-
-        while True:
-            if self._end == True:
-                self._game._canvas.create_text(
-                    400, 300, text="YOU LOST", font="sans-serif 72"
-                )
-            else:
-                self._game._canvas.create_text(
-                    400, 300, text="YOU WON!", font="sans-serif 72"
-                )
-
-                if self._player_points == 1:
-                    self._game._canvas.create_text(
-                        400,
-                        350,
-                        text=f"You Earned {self._player_points} Point!",
-                        font="sans-serif 24",
-                    )
-                else:
-                    self._game._canvas.create_text(
-                        400,
-                        350,
-                        text=f"You Earned {self._player_points} Points!",
-                        font="sans-serif 24",
-                    )
-
-            self._game.update()
-
-    def check_collide(self):
+    def collide(self):
+        # reset player gravity
+        self._player_stuck = False
+        # reset player stuck
         self._player_gravity = True
-        self._player_move = True
 
-        for item in self._sprites["player"].collide():
-            if item in self._sprites["obstacles_tags"]:
-                self._end = (
-                    True
-                )  # kill the player and end the game with it hits an obstacle
-            elif item in self._sprites["surfaces_tags"]:
-                collided_surface = self._sprites["surfaces"][
-                    self._sprites["surfaces_tags"].index(item)
-                ]
+        for item in self._player[0].collide():
+            # end the game when player collides into an obstacle
+            if item in self._obstacles_tags:
+                self._player_dead = True
+                self._end = True
 
-                if (
-                    self._sprites["player"]._coords[0]
-                    + self._sprites["player"]._dimensions[0]
-                    <= collided_surface._coords[0]
-                ):  # check if the player is in contact with the left side of the collided surface, if it is, prevent the player from moving
-                    self._player_move = False
-                elif (
-                    self._sprites["player"]._coords[1]
-                    + self._sprites["player"]._dimensions[1]
-                    >= collided_surface._coords[1]
-                ):  # check if the player is in contact with the top of the collided surface, if it is, prevent the player from falling
+            if item in self._surfaces_tags:
+                # bounding box for the collided surface
+                surface = self._surfaces[self._surfaces_tags.index(item)].bbox()
+                # bounding box for player
+                player = self._player[0].bbox()
+
+                if player[2] >= surface[0] > player[0]:
+                    # player is blocked by the surface and not completely in it
+
+                    # make sure player is not in surface by moving it out
+                    self._player[0].teleport(
+                        (surface[0] - (player[2] - player[0]), player[1])
+                    )
+
+                    # player is stuck
+                    self._player_stuck = True
+                elif player[3] >= surface[1]:
+                    # player is on the surface
+
+                    # turn off gravity to prevent falling
                     self._player_gravity = False
-                    self._sprites["player"].teleport(
-                        [
-                            self._sprites["player"]._coords[0],
-                            collided_surface._coords[1]
-                            - self._sprites["player"]._dimensions[1],
-                        ]
-                    )  # move the player on top of the surface if it falls into it slightly (due to jumping)
-            elif item in self._sprites["rewards_tags"]:
-                collided_surface = self._sprites["rewards"][
-                    self._sprites["rewards_tags"].index(item)
-                ]
-                collided_surface.delete()
+
+                    if player[3] < surface[3] and player[1] < surface[1]:
+                        # player is on top of surface
+
+                        # make sure player is not in surface by moving it up
+                        self._player[0].teleport(
+                            (player[0], surface[1] - (player[3] - player[1]))
+                        )
+                    else:
+                        # player is below or completely inside surface
+
+                        # stop jumping if player was below
+                        self._player_jumping = False
+                        # then turn on gravity
+                        self._player_gravity = True
+
+                        # make sure player is not in surface by moving it down
+                        self._player[0].teleport((player[0], surface[3]))
+
+            if item in self._rewards_tags:
+                # destroy reward if player collided with it
+                reward = self._rewards[self._rewards_tags.index(item)]
+                reward.delete()
+                # give the player one point
                 self._player_points += 1
+                # remove the reward from rewards
+                del self._rewards[self._rewards_tags.index(item)]
+                # remove the reward tag form reward tags
+                del self._rewards_tags[self._rewards_tags.index(item)]
+
+            if item in self._goal_tag:
+                # end game on contact with the goal
+                self._end = True

@@ -1,4 +1,4 @@
-from tkinter import Tk, Canvas
+from tkinter import Canvas, Tk
 
 GAME_DIMENSIONS = [800, 600]
 GAME_RESIZABLE = False
@@ -23,6 +23,9 @@ class Game(object):
         # initialize canvas to fill window
         self._canvas = Canvas(self._window, highlightthickness=0)
         self._canvas.pack(anchor="center", fill="both", expand=True)
+
+        # public canvas
+        self.canvas = self._canvas
 
         # watch window resize
         @self.on(event="<Configure>")
