@@ -1,8 +1,14 @@
+import sys
 from os import path
 
 
 def image_path(image):
-    return f"{path.dirname(__file__)}/images/{image}"
+    try:
+        directory = sys._MEIPASS
+    except KeyError:
+        directory = path.dirname(__file__)
+
+    return f"{directory}/images/{image}"
 
 
 player_image = image_path("player.png")
