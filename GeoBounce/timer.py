@@ -9,4 +9,4 @@ class Timer(object):
         self.time = time.time()
 
     def end(self, fps=60):
-        time.sleep(max(1 / fps - (time.time() - self.time), 0))
+        time.sleep(max((1 / fps - (time.time() - self.time)) / 1.25, 0))
