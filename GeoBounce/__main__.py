@@ -1,9 +1,9 @@
 import sys
 
-from .game import GAME_NAME, Game
-from .gui import GUI, Button, Label
-from .level import Level
-from .levels import LEVELS
+from GeoBounce.game import GAME_NAME, Game
+from GeoBounce.gui import GUI, Button, Label
+from GeoBounce.level import Level
+from GeoBounce.levels import LEVELS
 
 
 class GeoBounce(object):

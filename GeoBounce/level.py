@@ -1,12 +1,12 @@
-from .gui import GUI, Button, Label
-from .sprites import (
+from GeoBounce.gui import GUI, Button, Label
+from GeoBounce.sprites import (
     ImageSprite,
     LineSprite,
     OvalSprite,
     PolygonSprite,
     RectangleSprite,
 )
-from .timer import Timer
+from GeoBounce.timer import Timer
 
 SPEED = 5
 GRAVITY = 15
