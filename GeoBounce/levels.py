@@ -5,7 +5,7 @@ from os import path
 def image_path(image):
     try:
         directory = sys._MEIPASS
-    except KeyError:
+    except AttributeError:
         directory = path.dirname(__file__)
 
     return f"{directory}/images/{image}"
